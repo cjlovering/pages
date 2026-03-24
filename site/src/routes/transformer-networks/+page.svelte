@@ -193,7 +193,7 @@
 			small gradients." This motivates the scaling of the dot-product based on the dimensionality of the input vectors.
 		</p>
 
-		<Figure src="{base}/images/transformer-networks/scaled-dot-product.svg" alt="Scaled dot product attention" maxWidth="350px">
+		<Figure src="{base}/images/transformer-networks/scaled-dot-product.svg" alt="Scaled dot product attention" maxWidth="210px">
 			Scaled dot product attention.
 		</Figure>
 
@@ -399,7 +399,7 @@ tensor(
 
 		<p>The encoder consists of a stack of identical modules.</p>
 
-		<Figure src="{base}/images/transformer-networks/encoder-architecture.svg" alt="Encoder details" maxWidth="500px">
+		<Figure src="{base}/images/transformer-networks/encoder-architecture.svg" alt="Encoder details" maxWidth="300px">
 			Transformer Network Encoder Details.
 		</Figure>
 
@@ -429,7 +429,7 @@ tensor(
 			and combined with the positional encoding.
 		</p>
 
-		<Figure src="{base}/images/transformer-networks/decoder-architecture.svg" alt="Decoder details" maxWidth="500px">
+		<Figure src="{base}/images/transformer-networks/decoder-architecture.svg" alt="Decoder details" maxWidth="300px">
 			Transformer Network Decoder Details.
 		</Figure>
 

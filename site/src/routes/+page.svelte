@@ -536,7 +536,11 @@
 				</h2>
 				<div class="flex-1 h-px bg-border"></div>
 			</div>
-			{#if section.key === 'notes'}
+			{#if section.key === 'research'}
+				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">Some brief to-the-point style breakdowns of some of my research.</p>
+			{:else if section.key === 'exposition'}
+				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">I found it educational to walk through some papers and concepts and try to explain them bottom up. Or rather, mostly, I liked trying to make the figures nice.</p>
+			{:else if section.key === 'notes'}
 				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">Code tricks that I found useful during my PhD. Nowadays, though, Claude has got you covered!</p>
 			{/if}
 			<div class="cards" class:cards-compact={section.key === 'notes'}>
@@ -557,7 +561,7 @@
 						<div class="card-tags">
 							<span class="tag tag-date">{post.date}</span>
 							{#each post.tags as tag}
-								<span class="tag tag-topic">{tag}</span>
+								<span class="tag" class:tag-affiliation={tag === 'Kensho' || tag === 'Brown'} class:tag-topic={tag !== 'Kensho' && tag !== 'Brown'}>{tag}</span>
 							{/each}
 						</div>
 					</a>
@@ -655,6 +659,10 @@
 	.tag-topic {
 		background: #eef4f8;
 		color: #1a5276;
+	}
+	.tag-affiliation {
+		background: #fef3e8;
+		color: #a0510a;
 	}
 
 	@media (max-width: 500px) {

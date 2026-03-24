@@ -15,7 +15,7 @@
 	</header>
 
 	<section>
-		<p>
+		<p class="mb-8">
 			Beam search is a method for decoding a sequence given an auto-regressive function that outputs a probability
 			distribution over the next possible symbols. Ideally, a search algorithm would traverse all paths and select
 			the most probable sequence. However, this is prohibitively expensive.
@@ -37,7 +37,7 @@
 
 		<h3 id="walkthrough" class="text-xl font-serif font-normal mt-10 mb-4">Walkthrough</h3>
 
-		<p>
+		<p class="mb-8">
 			Given a function which takes a prefix of a sequence and outputs a probability distribution of output symbols
 			for the next item in the sequence, beam search is an approximate algorithm which searches for the path that
 			results in the most probable sequence. The path with the highest probability to start with may not end up
