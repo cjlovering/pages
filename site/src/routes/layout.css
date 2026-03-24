@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600&display=swap');
+@import 'tailwindcss';
+@import 'highlight.js/styles/github.css';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  /* Typography */
+  --font-serif: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-mono: SFMono-Regular, 'SF Mono', ui-monospace, Menlo, Monaco, Consolas, monospace;
+
+  /* Warm ink palette */
+  --color-ink: #282828;
+  --color-ink-1: #3c3836;
+  --color-ink-2: #504945;
+  --color-ink-3: #6b6866;
+  --color-ink-4: #676767;
+  --color-ink-5: #969696;
+
+  /* Surfaces */
+  --color-page: #ffffff;
+  --color-surface: #fafaf9;
+  --color-surface-code: #f3f3f2;
+  --color-border: #e8e5e0;
+  --color-border-light: #f0eeeb;
+
+  /* Accents */
+  --color-accent: #AD2111;
+  --color-accent-blue: #0E9EE4;
+  --color-marble-red: #ef4444;
+  --color-marble-blue: #3b82f6;
+}
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Selection */
+::selection { background-color: rgba(173, 33, 17, 0.12); }
+
+/* Scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-5) var(--color-page);
+}

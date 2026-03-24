@@ -1,0 +1,67 @@
+[
+  {
+    "source": "BLS",
+    "fullName": "Bureau of Labor Statistics",
+    "docs": 75,
+    "kTokPerDoc": 10,
+    "kTokPerDocSd": 14.8,
+    "spansPerDoc": 5,
+    "spansPerDocSd": 3.3,
+    "tokPerSpan": 16,
+    "tokPerSpanSd": 60.9,
+    "evidencePosPercent": 28,
+    "evidencePosSd": 23.4
+  },
+  {
+    "source": "PRE",
+    "fullName": "S&P Presale Reports",
+    "docs": 75,
+    "kTokPerDoc": 12,
+    "kTokPerDocSd": 5.5,
+    "spansPerDoc": 7,
+    "spansPerDocSd": 10.6,
+    "tokPerSpan": 9,
+    "tokPerSpanSd": 7.9,
+    "evidencePosPercent": 37,
+    "evidencePosSd": 23.1
+  },
+  {
+    "source": "SEC",
+    "fullName": "SEC 10-Q Reports",
+    "docs": 75,
+    "kTokPerDoc": 63,
+    "kTokPerDocSd": 102.8,
+    "spansPerDoc": 5,
+    "spansPerDocSd": 4.6,
+    "tokPerSpan": 11,
+    "tokPerSpanSd": 8.6,
+    "evidencePosPercent": 37,
+    "evidencePosSd": 22.3
+  },
+  {
+    "source": "EMM",
+    "fullName": "Municipal Bond Disclosures",
+    "docs": 75,
+    "kTokPerDoc": 123,
+    "kTokPerDocSd": 82.7,
+    "spansPerDoc": 6,
+    "spansPerDocSd": 8.0,
+    "tokPerSpan": 11,
+    "tokPerSpanSd": 9.8,
+    "evidencePosPercent": 24,
+    "evidencePosSd": 20.8
+  },
+  {
+    "source": "PG",
+    "fullName": "Project Gutenberg",
+    "docs": 75,
+    "kTokPerDoc": 109,
+    "kTokPerDocSd": 106.6,
+    "spansPerDoc": 4,
+    "spansPerDocSd": 2.6,
+    "tokPerSpan": 8,
+    "tokPerSpanSd": 6.0,
+    "evidencePosPercent": 22,
+    "evidencePosSd": 24.1
+  }
+]

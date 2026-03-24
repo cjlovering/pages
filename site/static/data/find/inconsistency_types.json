@@ -1,0 +1,29 @@
+[
+  {
+    "type": "Numeric",
+    "BLS": 48,
+    "PRE": 48,
+    "SEC": 40,
+    "EMM": 40,
+    "PG": 28,
+    "total": 204
+  },
+  {
+    "type": "Non-numeric",
+    "BLS": 13,
+    "PRE": 14,
+    "SEC": 12,
+    "EMM": 10,
+    "PG": 14,
+    "total": 63
+  },
+  {
+    "type": "Structural",
+    "BLS": 14,
+    "PRE": 13,
+    "SEC": 23,
+    "EMM": 25,
+    "PG": 33,
+    "total": 108
+  }
+]

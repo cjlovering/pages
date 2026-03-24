@@ -1,0 +1,41 @@
+{
+  "model": "gpt-5",
+  "results": [
+    {
+      "dataset": "BLS",
+      "answersPerDoc": 1.7,
+      "precision": 65.1,
+      "usefulness": 69.8
+    },
+    {
+      "dataset": "PRE",
+      "answersPerDoc": 2.6,
+      "precision": 46.2,
+      "usefulness": 70.8
+    },
+    {
+      "dataset": "SEC",
+      "answersPerDoc": 2.4,
+      "precision": 42.4,
+      "usefulness": 64.4
+    },
+    {
+      "dataset": "EMM",
+      "answersPerDoc": 4.0,
+      "precision": 65.7,
+      "usefulness": 74.7
+    },
+    {
+      "dataset": "PG",
+      "answersPerDoc": 2.4,
+      "precision": 43.3,
+      "usefulness": 53.3
+    },
+    {
+      "dataset": "AVG",
+      "answersPerDoc": 2.6,
+      "precision": 52.5,
+      "usefulness": 66.6
+    }
+  ]
+}
