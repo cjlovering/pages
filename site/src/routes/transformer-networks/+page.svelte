@@ -48,6 +48,12 @@
 			<a href="{base}/images/transformer-networks/transformer-tutorial.pdf" class="text-accent underline underline-offset-2 decoration-accent/30 hover:decoration-accent/60 transition-colors">here</a>.
 		</p>
 
+		<p class="bg-surface rounded px-4 py-3 text-[0.9rem] mb-6">
+			Since 2020, almost all models are now decoder-only (often termed "GPT-2 style"). The exception are
+			encoder-only models like BERT which are still used for, well, encoding. If you're interested in encoding,
+			I'd read <a href="https://arxiv.org/pdf/2205.13147" target="_blank" rel="noopener noreferrer" class="text-accent underline underline-offset-2 decoration-accent/30 hover:decoration-accent/60 transition-colors">Matryoshka Representation Learning</a>.
+		</p>
+
 		<h2 id="introduction" class="text-2xl font-serif font-normal mt-10 mb-4">Introduction</h2>
 
 		<p>

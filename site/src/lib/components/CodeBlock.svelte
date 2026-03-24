@@ -5,13 +5,6 @@
 <script>
 	import { onMount } from 'svelte';
 	import hljs from 'highlight.js/lib/core';
-	import python from 'highlight.js/lib/languages/python';
-	import bash from 'highlight.js/lib/languages/bash';
-	import latex from 'highlight.js/lib/languages/latex';
-
-	hljs.registerLanguage('python', python);
-	hljs.registerLanguage('bash', bash);
-	hljs.registerLanguage('latex', latex);
 
 	let { code, lang = '' } = $props();
 	let el = $state();

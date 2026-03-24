@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600&display=swap');
 @import 'tailwindcss';
-@import 'highlight.js/styles/github.css';
 @plugin '@tailwindcss/typography';
 
 @theme {
@@ -42,4 +41,9 @@ html { scroll-behavior: smooth; }
 html {
   scrollbar-width: thin;
   scrollbar-color: var(--color-ink-5) var(--color-page);
+}
+
+/* Override highlight.js background to match site palette */
+pre code.hljs {
+  background: transparent !important;
 }
