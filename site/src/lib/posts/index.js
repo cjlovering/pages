@@ -6,7 +6,7 @@ export const posts = [
 		subtitle: 'Can language models detect inconsistencies across long documents?',
 		date: '2025',
 		section: 'research',
-		tags: ['Kensho', 'Under Review', 'LLMs', 'datasets']
+		tags: ['Kensho', 'Under Review', 'LLMs', 'datasets', 'evaluation']
 	},
 	{
 		slug: 'fenway',
@@ -14,7 +14,7 @@ export const posts = [
 		subtitle: 'Evaluating numeric calibration in language model outputs.',
 		date: '2025',
 		section: 'research',
-		tags: ['Kensho', 'ACL 2025', 'LLMs', 'calibration']
+		tags: ['Kensho', 'ACL 2025', 'LLMs', 'calibration', 'interpretability']
 	},
 	{
 		slug: 'listicles',
