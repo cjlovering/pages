@@ -43,6 +43,11 @@ html {
   scrollbar-color: var(--color-ink-5) var(--color-page);
 }
 
+/* Paragraph spacing inside articles */
+article p + p {
+  margin-top: 1em;
+}
+
 /* Override highlight.js background to match site palette */
 pre code.hljs {
   background: transparent !important;

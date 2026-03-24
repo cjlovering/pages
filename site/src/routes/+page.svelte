@@ -11,6 +11,12 @@
 
 	let findCanvas = $state();
 	let fenwayCanvas = $state();
+	let listiclesCanvas = $state();
+	let rlCanvas = $state();
+	let transformerCanvas = $state();
+	let beamCanvas = $state();
+	let ntmCanvas = $state();
+	let bpeCanvas = $state();
 
 	const PALETTES = {
 		research: [
@@ -174,6 +180,65 @@
 		canvas.height = rect.height * dpr;
 		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 		return { ctx, W: rect.width, H: rect.height };
+	}
+
+	function drawDelaunay(ctx, W, H, points, opts = {}) {
+		const d = bowyerWatson(points);
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, W, H);
+		const maxR = W * (opts.maxCircR || 0.45);
+		const circs = [];
+		for (let i = 0; i < d.circumcircles.length; i++) {
+			const cc = d.circumcircles[i];
+			if (cc.r < Infinity && cc.r < W * 0.8) {
+				const tri = d.triangles[i];
+				const pa = points[tri.a], pb = points[tri.b], pc = points[tri.c];
+				circs.push({
+					x: cc.x, y: cc.y, r: cc.r,
+					color: pa.fill,
+					alpha: ((pa.alpha ?? 0.9) + (pb.alpha ?? 0.9) + (pc.alpha ?? 0.9)) / 3 * 0.1
+				});
+			}
+		}
+		circs.sort((a, b) => b.r - a.r);
+		for (const c of circs) {
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, Math.min(c.r, maxR), 0, Math.PI * 2);
+			ctx.fillStyle = hexToRgba(c.color, c.alpha);
+			ctx.fill();
+		}
+		ctx.lineWidth = 0.3;
+		for (const c of circs) {
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, Math.min(c.r, maxR), 0, Math.PI * 2);
+			ctx.strokeStyle = hexToRgba(c.color, c.alpha * 1.5);
+			ctx.stroke();
+		}
+		ctx.strokeStyle = opts.edgeColor || 'rgba(0,0,0,0.1)';
+		ctx.lineWidth = opts.edgeWidth || 0.4;
+		for (const t of d.triangles) {
+			ctx.beginPath();
+			ctx.moveTo(points[t.a].x, points[t.a].y);
+			ctx.lineTo(points[t.b].x, points[t.b].y);
+			ctx.lineTo(points[t.c].x, points[t.c].y);
+			ctx.closePath();
+			ctx.stroke();
+		}
+		for (const p of points) {
+			ctx.beginPath();
+			ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+			ctx.fillStyle = hexToRgba(p.fill, p.alpha ?? 0.9);
+			ctx.fill();
+		}
+		const cc2 = opts.centerColor || '#666';
+		for (const c of circs) {
+			if (c.x > 0 && c.x < W && c.y > 0 && c.y < H) {
+				ctx.beginPath();
+				ctx.arc(c.x, c.y, 0.5, 0, Math.PI * 2);
+				ctx.fillStyle = hexToRgba(cc2, 0.3);
+				ctx.fill();
+			}
+		}
 	}
 
 	/* ── FIND data ── */
@@ -504,16 +569,224 @@
 		}
 	}
 
-	onMount(() => {
+	/* ── Listicles card renderer ── */
+	function renderListiclesCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(314);
+		const pad = 14;
+		const clusters = [
+			{ cx: 0.22, cy: 0.28, n: 12, color: '#C48520' },
+			{ cx: 0.72, cy: 0.22, n: 10, color: '#D4982A' },
+			{ cx: 0.30, cy: 0.72, n: 11, color: '#B87A1A' },
+			{ cx: 0.78, cy: 0.68, n: 9, color: '#E0A832' },
+			{ cx: 0.50, cy: 0.48, n: 14, color: '#A86E15' },
+			{ cx: 0.15, cy: 0.55, n: 8, color: '#C89030' }
+		];
+		const points = [];
+		for (const cl of clusters) {
+			for (let i = 0; i < cl.n; i++) {
+				const a = rand() * Math.PI * 2;
+				const dist = rand() * 0.14 + rand() * 0.04;
+				points.push({
+					x: Math.max(pad, Math.min(W - pad, pad + (cl.cx + Math.cos(a) * dist) * (W - 2 * pad))),
+					y: Math.max(pad, Math.min(H - pad, pad + (cl.cy + Math.sin(a) * dist) * (H - 2 * pad))),
+					r: noisy(rand, rand() > 0.3 ? 1.8 : 1.0, 0.3, 0.5, 3.0),
+					fill: cl.color,
+					alpha: rand() > 0.3 ? 0.85 : 0.5
+				});
+			}
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(168,110,21,0.10)', centerColor: '#a86e15' });
+	}
+
+	/* ── Interpretable RL card renderer ── */
+	function renderRlCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(271);
+		const pad = 14;
+		const gridN = 8;
+		const hotspots = [
+			{ gx: 2, gy: 3, s: 1.0 }, { gx: 5, gy: 2, s: 0.8 },
+			{ gx: 6, gy: 5, s: 0.6 }, { gx: 3, gy: 6, s: 0.5 }
+		];
+		const points = [];
+		for (let gx = 0; gx < gridN; gx++) {
+			for (let gy = 0; gy < gridN; gy++) {
+				let attn = 0.05;
+				for (const h of hotspots) {
+					const dx = gx - h.gx, dy = gy - h.gy;
+					attn += h.s * Math.exp(-(dx * dx + dy * dy) / 2.5);
+				}
+				attn = Math.min(attn, 1);
+				points.push({
+					x: pad + ((gx + 0.5) / gridN) * (W - 2 * pad) + (rand() - 0.5) * 6,
+					y: pad + ((gy + 0.5) / gridN) * (H - 2 * pad) + (rand() - 0.5) * 6,
+					r: noisy(rand, 0.8 + attn * 2.2, 0.15, 0.5, 3.5),
+					fill: lerpHex('#b8e0c8', '#1a6b3a', attn),
+					alpha: 0.5 + attn * 0.45
+				});
+			}
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(26,107,58,0.08)', centerColor: '#1a6b3a' });
+	}
+
+	/* ── Transformer Networks card renderer ── */
+	function renderTransformerCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(173);
+		const pad = 14;
+		const nPos = 8;
+		const points = [];
+		for (let i = 0; i < nPos; i++) {
+			points.push({
+				x: pad + ((i + 0.5) / nPos) * (W - 2 * pad) + (rand() - 0.5) * 4,
+				y: pad + 0.15 * (H - 2 * pad) + (rand() - 0.5) * 8,
+				r: noisy(rand, 2.2, 0.2, 1.2, 3.2), fill: '#1a3a6b', alpha: 0.9
+			});
+		}
+		for (let i = 0; i < nPos; i++) {
+			points.push({
+				x: pad + ((i + 0.5) / nPos) * (W - 2 * pad) + (rand() - 0.5) * 4,
+				y: pad + 0.85 * (H - 2 * pad) + (rand() - 0.5) * 8,
+				r: noisy(rand, 2.2, 0.2, 1.2, 3.2), fill: '#2d5a9b', alpha: 0.9
+			});
+		}
+		for (let i = 0; i < 35; i++) {
+			const ei = Math.floor(rand() * nPos), di = Math.floor(rand() * nPos);
+			const t = rand();
+			const ex = pad + ((ei + 0.5) / nPos) * (W - 2 * pad);
+			const dx = pad + ((di + 0.5) / nPos) * (W - 2 * pad);
+			points.push({
+				x: ex + (dx - ex) * t + (rand() - 0.5) * 14,
+				y: pad + (0.15 + 0.7 * t) * (H - 2 * pad) + (rand() - 0.5) * 10,
+				r: noisy(rand, 0.7, 0.3, 0.3, 1.4),
+				fill: lerpHex('#4a6ea8', '#1a3a6b', rand()), alpha: 0.35 + rand() * 0.3
+			});
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(26,58,107,0.12)', centerColor: '#4a6ea8' });
+	}
+
+	/* ── Beam Search card renderer ── */
+	function renderBeamCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(628);
+		const pad = 14;
+		const points = [];
+		const levels = 6, bw = 3, vocab = 4;
+		points.push({
+			x: W / 2 + (rand() - 0.5) * 4, y: pad + 0.03 * (H - 2 * pad),
+			r: 2.5, fill: '#3a1560', alpha: 0.95
+		});
+		for (let lev = 1; lev < levels; lev++) {
+			const yBase = pad + (lev / (levels - 0.5)) * (H - 2 * pad);
+			const n = lev === 1 ? vocab : bw * vocab;
+			const spread = 0.08 + lev * 0.15;
+			for (let i = 0; i < n; i++) {
+				const sel = i < bw;
+				const xN = 0.5 + (n > 1 ? (i / (n - 1) - 0.5) : 0) * spread * 2;
+				points.push({
+					x: pad + xN * (W - 2 * pad) + (rand() - 0.5) * 10,
+					y: yBase + (rand() - 0.5) * 8,
+					r: noisy(rand, sel ? 1.8 : 0.9, 0.2, 0.4, 2.8),
+					fill: sel ? lerpHex('#5a2d7a', '#7b4fa0', rand()) : '#c0a8d8',
+					alpha: sel ? 0.85 : 0.3
+				});
+			}
+		}
+		for (let i = 0; i < 15; i++) {
+			points.push({
+				x: pad + rand() * (W - 2 * pad), y: pad + rand() * (H - 2 * pad),
+				r: noisy(rand, 0.4, 0.3, 0.2, 0.8), fill: '#c0a0e0', alpha: 0.15
+			});
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(90,45,122,0.10)', centerColor: '#5a2d7a' });
+	}
+
+	/* ── Neural Turing Machines card renderer ── */
+	function renderNtmCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(987);
+		const pad = 14;
+		const rows = 8, cols = 10;
+		const rHead = { r: 3, c: 5 }, wHead = { r: 6, c: 2 };
+		const points = [];
+		for (let r = 0; r < rows; r++) {
+			for (let c = 0; c < cols; c++) {
+				const mv = rand();
+				const rd = Math.sqrt((r - rHead.r) ** 2 + (c - rHead.c) ** 2);
+				const wd = Math.sqrt((r - wHead.r) ** 2 + (c - wHead.c) ** 2);
+				const ra = Math.exp(-rd * rd / 3), wa = Math.exp(-wd * wd / 3);
+				let fill, alpha;
+				if (ra > 0.3) { fill = lerpHex('#a8d8f0', '#0E9EE4', ra); alpha = 0.6 + ra * 0.35; }
+				else if (wa > 0.3) { fill = lerpHex('#ffcca0', '#E8890C', wa); alpha = 0.6 + wa * 0.35; }
+				else { fill = lerpHex('#d0d0d0', '#808080', mv); alpha = 0.4 + mv * 0.3; }
+				points.push({
+					x: pad + ((c + 0.5) / cols) * (W - 2 * pad) + (rand() - 0.5) * 4,
+					y: pad + ((r + 0.5) / rows) * (H - 2 * pad) + (rand() - 0.5) * 4,
+					r: noisy(rand, 0.8 + (ra + wa) * 1.5 + mv * 0.5, 0.15, 0.4, 3.5),
+					fill, alpha
+				});
+			}
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(14,158,228,0.08)', centerColor: '#0E9EE4' });
+	}
+
+	/* ── Byte-Pair Encoding card renderer ── */
+	function renderBpeCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(555);
+		const pad = 14;
+		const layers = [
+			{ y: 0.88, n: 16, color: '#a86830', size: 0.8 },
+			{ y: 0.68, n: 12, color: '#9a5e28', size: 1.2 },
+			{ y: 0.48, n: 8, color: '#8a5020', size: 1.6 },
+			{ y: 0.30, n: 5, color: '#7a4518', size: 2.0 },
+			{ y: 0.12, n: 3, color: '#6a3a10', size: 2.5 }
+		];
+		const points = [];
+		for (const lay of layers) {
+			for (let i = 0; i < lay.n; i++) {
+				points.push({
+					x: pad + ((i + 0.5) / lay.n) * (W - 2 * pad) + (rand() - 0.5) * 10,
+					y: pad + lay.y * (H - 2 * pad) + (rand() - 0.5) * 8,
+					r: noisy(rand, lay.size, 0.2, 0.4, 3.5),
+					fill: lerpHex(lay.color, '#d4a870', rand() * 0.3),
+					alpha: 0.7 + rand() * 0.25
+				});
+			}
+		}
+		for (let l = 0; l < layers.length - 1; l++) {
+			for (let i = 0; i < 4; i++) {
+				const t = rand();
+				points.push({
+					x: pad + rand() * (W - 2 * pad),
+					y: pad + (layers[l].y + (layers[l + 1].y - layers[l].y) * t) * (H - 2 * pad),
+					r: noisy(rand, 0.5, 0.3, 0.2, 1.0),
+					fill: lerpHex(layers[l].color, layers[l + 1].color, t),
+					alpha: 0.3 + rand() * 0.2
+				});
+			}
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(106,58,16,0.10)', centerColor: '#8a5020' });
+	}
+
+	function renderAll() {
 		if (findCanvas) renderFindCard(findCanvas);
 		if (fenwayCanvas) renderFenwayCard(fenwayCanvas);
+		if (listiclesCanvas) renderListiclesCard(listiclesCanvas);
+		if (rlCanvas) renderRlCard(rlCanvas);
+		if (transformerCanvas) renderTransformerCard(transformerCanvas);
+		if (beamCanvas) renderBeamCard(beamCanvas);
+		if (ntmCanvas) renderNtmCard(ntmCanvas);
+		if (bpeCanvas) renderBpeCard(bpeCanvas);
+	}
+
+	onMount(() => {
+		renderAll();
 		let timer;
 		const onResize = () => {
 			clearTimeout(timer);
-			timer = setTimeout(() => {
-				if (findCanvas) renderFindCard(findCanvas);
-				if (fenwayCanvas) renderFenwayCard(fenwayCanvas);
-			}, 150);
+			timer = setTimeout(renderAll, 150);
 		};
 		window.addEventListener('resize', onResize);
 		return () => window.removeEventListener('resize', onResize);
@@ -523,6 +796,14 @@
 <svelte:head>
 	<title>Charles Lovering</title>
 </svelte:head>
+
+<section class="mb-14">
+	<div class="flex items-center gap-4 mb-6">
+		<h1 class="text-sm font-sans font-semibold text-ink-3 uppercase tracking-widest shrink-0">Charles Lovering</h1>
+		<div class="flex-1 h-px bg-border"></div>
+	</div>
+	<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">I work on understanding neural models (language models, vision models, game-playing models) &mdash; focused mostly on their internals (interpretability during my PhD) and behavior (more so in my professional role.) I completed my PhD at Brown University in 2023 and thereafter have worked as a research scientist at Kensho Technologies.</p>
+</section>
 
 {#each sections as section, si}
 	{@const items = postsBySection(section.key)}
@@ -551,6 +832,18 @@
 								<canvas bind:this={findCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'fenway'}
 								<canvas bind:this={fenwayCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'listicles'}
+								<canvas bind:this={listiclesCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'interpretable-rl'}
+								<canvas bind:this={rlCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'transformer-networks'}
+								<canvas bind:this={transformerCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'beam-search'}
+								<canvas bind:this={beamCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'neural-turing'}
+								<canvas bind:this={ntmCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'byte-encoding'}
+								<canvas bind:this={bpeCanvas} class="canvas-fill"></canvas>
 							{:else}
 								<div class="pane-inner" style={paneGradient(section.key, pi)}>
 									<span class="pane-title">{post.title}</span>
@@ -561,7 +854,12 @@
 						<div class="card-tags">
 							<span class="tag tag-date">{post.date}</span>
 							{#each post.tags as tag}
-								<span class="tag" class:tag-affiliation={tag === 'Kensho' || tag === 'Brown'} class:tag-topic={tag !== 'Kensho' && tag !== 'Brown'}>{tag}</span>
+								<span class="tag"
+								class:tag-affiliation={tag === 'Kensho' || tag === 'Brown'}
+								class:tag-venue={tag === 'ACL 2025' || tag === 'Under Review' || tag === 'Shelved'}
+								class:tag-topic={tag !== 'Kensho' && tag !== 'Brown' && tag !== 'ACL 2025' && tag !== 'Under Review' && tag !== 'Shelved'}
+								class:tag-shelved={tag === 'Shelved'}
+							>{tag}</span>
 							{/each}
 						</div>
 					</a>
@@ -663,6 +961,13 @@
 	.tag-affiliation {
 		background: #fef3e8;
 		color: #a0510a;
+	}
+	.tag-venue {
+		background: #e8f5f3;
+		color: #1a6b5a;
+	}
+	.tag-shelved {
+		text-decoration: line-through;
 	}
 
 	@media (max-width: 500px) {

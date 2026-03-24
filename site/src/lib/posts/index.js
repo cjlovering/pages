@@ -6,7 +6,7 @@ export const posts = [
 		subtitle: 'Can language models detect inconsistencies across long documents?',
 		date: '2025',
 		section: 'research',
-		tags: ['LLMs', 'datasets', 'Kensho']
+		tags: ['Kensho', 'Under Review', 'LLMs', 'datasets']
 	},
 	{
 		slug: 'fenway',
@@ -14,7 +14,7 @@ export const posts = [
 		subtitle: 'Evaluating numeric calibration in language model outputs.',
 		date: '2025',
 		section: 'research',
-		tags: ['LLMs', 'calibration', 'ACL 2025', 'Kensho']
+		tags: ['Kensho', 'ACL 2025', 'LLMs', 'calibration']
 	},
 	{
 		slug: 'listicles',
@@ -22,7 +22,7 @@ export const posts = [
 		subtitle: 'A natural dataset without the biases of human-elicited datasets.',
 		date: '2018',
 		section: 'research',
-		tags: ['datasets', 'NLP', 'Brown']
+		tags: ['Brown', 'Shelved', 'datasets', 'NLP']
 	},
 	{
 		slug: 'interpretable-rl',
@@ -30,7 +30,7 @@ export const posts = [
 		subtitle: 'Reimplementation for NeurIPS Reproducibility Challenge 2019.',
 		date: '2019',
 		section: 'research',
-		tags: ['reinforcement learning', 'interpretability', 'Brown']
+		tags: ['Brown', 'Shelved', 'reinforcement learning', 'interpretability']
 	},
 
 	// ── Exposition ────────────────────────────────────────
