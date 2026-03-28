@@ -22,7 +22,7 @@ export const posts = [
 		subtitle: 'A natural dataset without the biases of human-elicited datasets.',
 		date: '2018',
 		section: 'research',
-		tags: ['Brown', 'Shelved', 'datasets', 'NLP']
+		tags: ['Brown', 'datasets', 'NLP']
 	},
 	{
 		slug: 'training-priors',
@@ -38,7 +38,7 @@ export const posts = [
 		subtitle: 'Reimplementation for NeurIPS Reproducibility Challenge 2019.',
 		date: '2019',
 		section: 'research',
-		tags: ['Brown', 'Shelved', 'reinforcement learning', 'interpretability']
+		tags: ['Brown', 'reinforcement learning', 'interpretability']
 	},
 
 	// ── Exposition ────────────────────────────────────────
