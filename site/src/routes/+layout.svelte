@@ -1,4 +1,5 @@
 <script>
+	import { base } from '$app/paths';
 	import './layout.css';
 	import 'highlight.js/styles/base16/solarized-light.css';
 	import Header from '$lib/components/Header.svelte';
@@ -24,7 +25,9 @@
 
 <svelte:head>
 	<title>Charles Lovering</title>
-	<meta name="description" content="Research, exposition, and technical notes on machine learning, NLP, and software engineering." />
+	<meta name="description" content="Research, exposition, and technical notes on language modeling, interpretability, and evaluation." />
+	<link rel="icon" type="image/png" sizes="32x32" href="{base}/favicon-32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="{base}/favicon-16.png" />
 </svelte:head>
 
 <div class="min-h-screen bg-page text-ink font-serif">

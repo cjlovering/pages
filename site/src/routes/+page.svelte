@@ -798,11 +798,25 @@
 </svelte:head>
 
 <section class="mb-14">
-	<div class="flex items-center gap-4 mb-6">
-		<h1 class="text-sm font-sans font-semibold text-ink-3 uppercase tracking-widest shrink-0">Charles Lovering</h1>
-		<div class="flex-1 h-px bg-border"></div>
+	<div class="flex items-start gap-5">
+		<img src="{base}/me-180.png" alt="Charles Lovering" class="w-[72px] h-[72px] rounded-lg shrink-0 shadow-sm" />
+		<div class="min-w-0">
+			<h1 class="text-[1.1rem] font-sans font-semibold text-ink tracking-tight leading-tight">Charles Lovering</h1>
+			<p class="text-ink-4 text-[0.88rem] font-sans mt-0.5">Studies neural models</p>
+			<div class="flex gap-3 mt-2">
+				<a href="https://github.com/cjlovering" target="_blank" rel="noopener noreferrer"
+					class="text-ink-5 hover:text-ink-2 transition-colors" aria-label="GitHub">
+					<svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+				</a>
+				<a href="https://scholar.google.com/citations?user=w0hYPqEAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener noreferrer"
+					class="text-ink-5 hover:text-ink-2 transition-colors" aria-label="Google Scholar">
+					<svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769 0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
+				</a>
+			</div>
+		</div>
 	</div>
-	<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">I work on understanding neural models (language models, vision models, game-playing models) &mdash; focused mostly on their internals (interpretability during my PhD) and behavior (more so in my professional role.) I completed my PhD at Brown University in 2023 and thereafter have worked as a research scientist at Kensho Technologies.</p>
+	<p class="text-ink-3 text-[0.92rem] leading-relaxed mt-5">I work on understanding neural models (language models, vision models, game-playing models) &mdash; their internals (more so during my PhD; i.e., interpretability) and their behavior (more so in my professional role; i.e., evaluation). I completed my PhD at Brown University in 2023 and thereafter have worked as a research scientist at Kensho Technologies.</p>
+	<div class="h-px bg-border mt-6"></div>
 </section>
 
 {#each sections as section, si}
@@ -818,9 +832,9 @@
 				<div class="flex-1 h-px bg-border"></div>
 			</div>
 			{#if section.key === 'research'}
-				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">Some brief to-the-point style breakdowns of some of my research.</p>
+				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">Brief breakdowns of some of my research.</p>
 			{:else if section.key === 'exposition'}
-				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">I found it educational to walk through some papers and concepts and try to explain them bottom up. Or rather, mostly, I liked trying to make the figures nice.</p>
+				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">I found it educational to walk through some papers/concepts. Or rather, mostly, I liked trying to make the figures nice.</p>
 			{:else if section.key === 'notes'}
 				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">Code tricks that I found useful during my PhD. Nowadays, though, Claude has got you covered!</p>
 			{/if}

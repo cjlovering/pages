@@ -1,0 +1,28 @@
+# Source/demo folders (not part of the sites)
+fenway_demo/
+find_demo/
+lora_files/
+
+# Loose HTML files (except the landing page)
+*.html
+!index.html
+
+# OS
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# SvelteKit build artifacts
+.svelte-kit/
+build/
+
+# Assembled static output
+dist/
+
+# Vite cache
+.vite/
+
+# Analysis outputs (generated, not source)
+fenway-site/static/analysis_output
+fenway-site/static/figures
