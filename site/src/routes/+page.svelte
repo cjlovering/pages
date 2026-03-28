@@ -17,6 +17,22 @@
 	let beamCanvas = $state();
 	let ntmCanvas = $state();
 	let bpeCanvas = $state();
+	let trainingPriorsCanvas = $state();
+	let lindenmayerCanvas = $state();
+	let playgroundCanvas = $state();
+
+	const artifacts = [
+		{
+			title: 'Lindenmayer Systems',
+			subtitle: 'Generative drawings from L-system grammars.',
+			url: 'https://observablehq.com/collection/@xenocidist/lindenmayer-systems'
+		},
+		{
+			title: 'Interactive Visualizations',
+			subtitle: 'A small playground of interactive sketches.',
+			url: 'https://cjlovering.github.io/playground/'
+		}
+	];
 
 	const PALETTES = {
 		research: [
@@ -770,6 +786,153 @@
 		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(106,58,16,0.10)', centerColor: '#8a5020' });
 	}
 
+	/* ── Training Priors card renderer ── */
+	function renderTrainingPriorsCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(306);
+		const pad = 14;
+		const points = [];
+
+		// Scatter: x = log SVO frequency, y = alignment — mimics the paper's Figure 3
+		const scatterData = [
+			[0,0.15],[0,0.2],[0,0.2],[0,0.25],[0,0.3],[0,0.35],[0,0.45],[0,0.5],[0,0.65],[0,0.75],
+			[0.3,0.1],[0.3,0.2],[0.3,0.35],[0.3,0.5],[0.6,0.15],[0.6,0.3],[0.6,0.45],[0.6,0.5],
+			[0.9,0.2],[0.9,0.4],[0.9,0.55],[0.9,0.6],[0.9,0.75],[1.1,0.25],[1.1,0.5],[1.1,0.65],
+			[1.1,0.8],[1.4,0.35],[1.4,0.55],[1.4,0.7],[1.4,0.8],[1.7,0.4],[1.7,0.6],[1.7,0.75],
+			[1.7,0.85],[2.0,0.5],[2.0,0.7],[2.0,0.8],[2.0,0.9],[2.3,0.6],[2.3,0.75],[2.3,0.85],
+			[2.3,0.95],[2.6,0.7],[2.6,0.8],[2.6,0.9],[2.9,0.75],[2.9,0.85],[2.9,0.95],[3.2,0.85],
+			[3.2,0.9],[3.4,0.95]
+		];
+		const maxX = 3.5;
+		for (const [fx, al] of scatterData) {
+			const xN = fx / maxX;
+			const yN = 1 - al;
+			points.push({
+				x: pad + xN * (W - 2 * pad) + (rand() - 0.5) * 8,
+				y: pad + yN * (H - 2 * pad) + (rand() - 0.5) * 8,
+				r: noisy(rand, 1.4 + al * 1.2, 0.2, 0.6, 3.2),
+				fill: lerpHex('#c8a070', '#AD2111', al),
+				alpha: 0.5 + al * 0.4
+			});
+		}
+		// Ambient noise
+		for (let i = 0; i < 20; i++) {
+			points.push({
+				x: pad + rand() * (W - 2 * pad),
+				y: pad + rand() * (H - 2 * pad),
+				r: noisy(rand, 0.4, 0.3, 0.2, 0.8),
+				fill: '#d4b090',
+				alpha: 0.15
+			});
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(173,33,17,0.08)', centerColor: '#AD2111' });
+	}
+
+	/* ── Lindenmayer Systems card renderer ── */
+	function renderLindenmayerCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(161);
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, W, H);
+
+		const rules = { F: 'FF+[+F-F-F]-[-F+F+F]' };
+		let axiom = 'F';
+		for (let g = 0; g < 4; g++) {
+			let next = '';
+			for (const ch of axiom) next += rules[ch] || ch;
+			axiom = next;
+		}
+		const angle = (25 * Math.PI) / 180;
+		const step = Math.min(W, H) * 0.028;
+		const segments = [];
+		let x = W * 0.5, y = H * 0.92, dir = -Math.PI / 2;
+		const stack = [];
+		for (const ch of axiom) {
+			if (ch === 'F') {
+				const nx = x + Math.cos(dir) * step;
+				const ny = y + Math.sin(dir) * step;
+				segments.push({ x1: x, y1: y, x2: nx, y2: ny });
+				x = nx; y = ny;
+			} else if (ch === '+') { dir += angle; }
+			else if (ch === '-') { dir -= angle; }
+			else if (ch === '[') { stack.push({ x, y, dir }); }
+			else if (ch === ']') { const s = stack.pop(); x = s.x; y = s.y; dir = s.dir; }
+		}
+		let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+		for (const s of segments) {
+			if (s.x1 < minX) minX = s.x1; if (s.x2 < minX) minX = s.x2;
+			if (s.y1 < minY) minY = s.y1; if (s.y2 < minY) minY = s.y2;
+			if (s.x1 > maxX) maxX = s.x1; if (s.x2 > maxX) maxX = s.x2;
+			if (s.y1 > maxY) maxY = s.y1; if (s.y2 > maxY) maxY = s.y2;
+		}
+		const sw = maxX - minX || 1, sh = maxY - minY || 1;
+		const scale = Math.min((W - 28) / sw, (H - 28) / sh);
+		const ox = (W - sw * scale) / 2 - minX * scale;
+		const oy = (H - sh * scale) / 2 - minY * scale;
+
+		for (const s of segments) {
+			const depth = Math.min(1, Math.sqrt((s.y1 - minY) / sh));
+			ctx.beginPath();
+			ctx.moveTo(s.x1 * scale + ox, s.y1 * scale + oy);
+			ctx.lineTo(s.x2 * scale + ox, s.y2 * scale + oy);
+			ctx.strokeStyle = lerpHex('#5a8a3a', '#a8cc78', depth);
+			ctx.lineWidth = 1.2 - depth * 0.6;
+			ctx.globalAlpha = 0.5 + (1 - depth) * 0.4;
+			ctx.stroke();
+		}
+		ctx.globalAlpha = 1;
+	}
+
+	/* ── Interactive Visualizations (playground) card renderer ── */
+	function renderPlaygroundCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(808);
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, W, H);
+
+		const cols = ['#3a6b9f', '#c44030', '#e8a020', '#2a9d6a', '#7b5ea7', '#d06040'];
+		const shapes = [];
+		for (let i = 0; i < 30; i++) {
+			shapes.push({
+				x: rand() * W, y: rand() * H,
+				r: 6 + rand() * 18,
+				sides: 3 + Math.floor(rand() * 5),
+				color: cols[Math.floor(rand() * cols.length)],
+				rot: rand() * Math.PI * 2,
+				alpha: 0.25 + rand() * 0.35
+			});
+		}
+		for (const s of shapes) {
+			ctx.beginPath();
+			for (let j = 0; j <= s.sides; j++) {
+				const a = s.rot + (j / s.sides) * Math.PI * 2;
+				const px = s.x + Math.cos(a) * s.r;
+				const py = s.y + Math.sin(a) * s.r;
+				if (j === 0) ctx.moveTo(px, py);
+				else ctx.lineTo(px, py);
+			}
+			ctx.closePath();
+			ctx.fillStyle = hexToRgba(s.color, s.alpha);
+			ctx.fill();
+			ctx.strokeStyle = hexToRgba(s.color, s.alpha * 1.6);
+			ctx.lineWidth = 0.5;
+			ctx.stroke();
+		}
+		ctx.strokeStyle = 'rgba(0,0,0,0.04)';
+		ctx.lineWidth = 0.3;
+		for (let i = 0; i < shapes.length; i++) {
+			for (let j = i + 1; j < shapes.length; j++) {
+				const dx = shapes[i].x - shapes[j].x, dy = shapes[i].y - shapes[j].y;
+				if (Math.sqrt(dx * dx + dy * dy) < 80) {
+					ctx.beginPath();
+					ctx.moveTo(shapes[i].x, shapes[i].y);
+					ctx.lineTo(shapes[j].x, shapes[j].y);
+					ctx.stroke();
+				}
+			}
+		}
+	}
+
 	function renderAll() {
 		if (findCanvas) renderFindCard(findCanvas);
 		if (fenwayCanvas) renderFenwayCard(fenwayCanvas);
@@ -779,6 +942,9 @@
 		if (beamCanvas) renderBeamCard(beamCanvas);
 		if (ntmCanvas) renderNtmCard(ntmCanvas);
 		if (bpeCanvas) renderBpeCard(bpeCanvas);
+		if (trainingPriorsCanvas) renderTrainingPriorsCard(trainingPriorsCanvas);
+		if (lindenmayerCanvas) renderLindenmayerCard(lindenmayerCanvas);
+		if (playgroundCanvas) renderPlaygroundCard(playgroundCanvas);
 	}
 
 	onMount(() => {
@@ -848,6 +1014,8 @@
 								<canvas bind:this={fenwayCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'listicles'}
 								<canvas bind:this={listiclesCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'training-priors'}
+								<canvas bind:this={trainingPriorsCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'interpretable-rl'}
 								<canvas bind:this={rlCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'transformer-networks'}
@@ -879,6 +1047,32 @@
 					</a>
 				{/each}
 			</div>
+			{#if section.key === 'research'}
+				<div class="flex items-center gap-4 mb-6 mt-10">
+					<h2 class="text-sm font-sans font-medium text-ink-4 uppercase tracking-widest shrink-0">
+						Artifacts
+					</h2>
+					<div class="flex-1 h-px bg-border"></div>
+				</div>
+				<p class="text-ink-3 text-[0.92rem] leading-relaxed mb-6">Visualizations and interactive notebooks.</p>
+				<div class="cards">
+					{#each artifacts as artifact}
+						<a href={artifact.url} target="_blank" rel="noopener noreferrer" class="card">
+							<div class="pane artifact-pane">
+								{#if artifact.title === 'Lindenmayer Systems'}
+									<canvas bind:this={lindenmayerCanvas} class="canvas-fill"></canvas>
+								{:else}
+									<canvas bind:this={playgroundCanvas} class="canvas-fill"></canvas>
+								{/if}
+								<svg class="external-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path d="M4.25 5.5a.75.75 0 0 0-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-3.5a.75.75 0 0 1 1.5 0v3.5A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4h3.5a.75.75 0 0 1 0 1.5h-3.5ZM11 3.5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0V5.56l-5.22 5.22a.75.75 0 1 1-1.06-1.06l5.22-5.22H11.75A.75.75 0 0 1 11 3.5Z" />
+								</svg>
+							</div>
+							<p class="card-label">{artifact.title}</p>
+						</a>
+					{/each}
+				</div>
+			{/if}
 		</section>
 	{/if}
 {/each}
@@ -982,6 +1176,23 @@
 	}
 	.tag-shelved {
 		text-decoration: line-through;
+	}
+
+	.artifact-pane {
+		position: relative;
+	}
+	.external-icon {
+		position: absolute;
+		top: 8px;
+		right: 8px;
+		width: 16px;
+		height: 16px;
+		color: rgba(0, 0, 0, 0.3);
+		transition: color 0.2s ease;
+		pointer-events: none;
+	}
+	.card:hover .external-icon {
+		color: rgba(0, 0, 0, 0.55);
 	}
 
 	@media (max-width: 500px) {

@@ -419,3 +419,22 @@
 &#125;</code></pre>
 
 </article>
+
+<style>
+	.heading-anchor {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		left: -1.2rem;
+		opacity: 0;
+		color: color-mix(in srgb, #676767 65%, transparent);
+		text-decoration: none;
+		font-family: 'Iowan Old Style', Georgia, serif;
+		font-weight: 400;
+		font-size: 1em;
+		transition: opacity 150ms ease-in-out;
+	}
+	h2:hover .heading-anchor {
+		opacity: 1;
+	}
+</style>
