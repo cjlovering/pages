@@ -25,6 +25,14 @@ export const posts = [
 		tags: ['Brown', 'Shelved', 'datasets', 'NLP']
 	},
 	{
+		slug: 'training-priors',
+		title: 'Training Priors Predict Text-To-Image Model Performance',
+		subtitle: 'Do text-to-image models generalize compositionally or mix-and-match from training?',
+		date: '2023',
+		section: 'research',
+		tags: ['Brown', 'Shelved', 'text-to-image', 'evaluation']
+	},
+	{
 		slug: 'interpretable-rl',
 		title: 'Towards Interpretable Reinforcement Learning',
 		subtitle: 'Reimplementation for NeurIPS Reproducibility Challenge 2019.',
