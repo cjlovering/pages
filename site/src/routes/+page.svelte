@@ -18,6 +18,7 @@
 	let ntmCanvas = $state();
 	let bpeCanvas = $state();
 	let trainingPriorsCanvas = $state();
+	let predictingBiasesCanvas = $state();
 	let lindenmayerCanvas = $state();
 	let playgroundCanvas = $state();
 
@@ -828,6 +829,74 @@
 		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(173,33,17,0.08)', centerColor: '#AD2111' });
 	}
 
+	/* ── Predicting Biases card renderer ── */
+	function renderPredictingBiasesCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(2021);
+		const pad = 14;
+		const points = [];
+
+		// Learning curves: x = s-only rate (evidence), y = s-only error
+		// Each curve = one (target, spurious) pair at a given relative MDL
+		const curves = [
+			{ mdlRatio: 1.26, label: 'easy' },
+			{ mdlRatio: 0.80, label: 'med-easy' },
+			{ mdlRatio: 0.40, label: 'medium' },
+			{ mdlRatio: 0.10, label: 'med-hard' },
+			{ mdlRatio: 0.002, label: 'hard' },
+		];
+		const sOnlyRates = [0.0, 0.05, 0.10, 0.15, 0.25, 0.35, 0.50, 0.65, 0.80, 1.0];
+
+		// Models as layers (BERT, RoBERTa, T5, GPT-2, LSTM)
+		const modelOffsets = [0, 0.04, -0.03, 0.06, -0.05];
+
+		for (let ci = 0; ci < curves.length; ci++) {
+			const curve = curves[ci];
+			// Higher MDL ratio → target is easy → error drops fast
+			const difficulty = 1 - Math.min(1, curve.mdlRatio / 1.3);
+			// Color: blue (easy target) → red (hard target)
+			const curveColor = lerpHex('#2d78b8', '#AD2111', difficulty);
+
+			for (let mi = 0; mi < modelOffsets.length; mi++) {
+				for (let si = 0; si < sOnlyRates.length; si++) {
+					const sRate = sOnlyRates[si];
+					// S-only error: decays with evidence, slower for hard targets
+					const decay = curve.mdlRatio > 0.5 ? 8.0 : curve.mdlRatio > 0.1 ? 3.0 : 1.2;
+					let error = Math.exp(-sRate * decay);
+					error = error * (0.85 + difficulty * 0.15);
+					error += modelOffsets[mi] * (1 - sRate);
+
+					const xN = sRate;
+					const yN = 1 - Math.max(0, Math.min(1, error));
+
+					points.push({
+						x: pad + xN * (W - 2 * pad) + (rand() - 0.5) * 6,
+						y: pad + yN * (H - 2 * pad) + (rand() - 0.5) * 6,
+						r: noisy(rand, 1.0 + (1 - difficulty) * 1.2, 0.2, 0.4, 2.8),
+						fill: curveColor,
+						alpha: 0.55 + (1 - difficulty) * 0.35
+					});
+				}
+			}
+		}
+
+		// Ambient noise for texture
+		for (let i = 0; i < 18; i++) {
+			points.push({
+				x: pad + rand() * (W - 2 * pad),
+				y: pad + rand() * (H - 2 * pad),
+				r: noisy(rand, 0.4, 0.3, 0.2, 0.7),
+				fill: lerpHex('#c0b8d0', '#8070a0', rand()),
+				alpha: 0.12
+			});
+		}
+
+		drawDelaunay(ctx, W, H, points, {
+			edgeColor: 'rgba(45,120,184,0.08)',
+			centerColor: '#6050a0'
+		});
+	}
+
 	/* ── Lindenmayer Systems card renderer ── */
 	function renderLindenmayerCard(canvas) {
 		const { ctx, W, H } = setupCanvas(canvas);
@@ -943,6 +1012,7 @@
 		if (ntmCanvas) renderNtmCard(ntmCanvas);
 		if (bpeCanvas) renderBpeCard(bpeCanvas);
 		if (trainingPriorsCanvas) renderTrainingPriorsCard(trainingPriorsCanvas);
+		if (predictingBiasesCanvas) renderPredictingBiasesCard(predictingBiasesCanvas);
 		if (lindenmayerCanvas) renderLindenmayerCard(lindenmayerCanvas);
 		if (playgroundCanvas) renderPlaygroundCard(playgroundCanvas);
 	}
@@ -1014,6 +1084,8 @@
 								<canvas bind:this={fenwayCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'listicles'}
 								<canvas bind:this={listiclesCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'predicting-biases'}
+								<canvas bind:this={predictingBiasesCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'training-priors'}
 								<canvas bind:this={trainingPriorsCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'interpretable-rl'}
@@ -1038,8 +1110,8 @@
 							{#each post.tags as tag}
 								<span class="tag"
 								class:tag-affiliation={tag === 'Kensho' || tag === 'Brown'}
-								class:tag-venue={tag === 'ACL 2025' || tag === 'Under Review' || tag === 'Shelved'}
-								class:tag-topic={tag !== 'Kensho' && tag !== 'Brown' && tag !== 'ACL 2025' && tag !== 'Under Review' && tag !== 'Shelved'}
+								class:tag-venue={tag === 'ACL 2025' || tag === 'ICLR 2021' || tag === 'Under Review' || tag === 'Shelved'}
+								class:tag-topic={tag !== 'Kensho' && tag !== 'Brown' && tag !== 'ACL 2025' && tag !== 'ICLR 2021' && tag !== 'Under Review' && tag !== 'Shelved'}
 								class:tag-shelved={tag === 'Shelved'}
 							>{tag}</span>
 							{/each}
