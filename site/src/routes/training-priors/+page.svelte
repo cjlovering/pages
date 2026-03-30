@@ -60,6 +60,10 @@
 	<Toc items={tocItems} />
 
 	<!-- ═══ Introduction ═══ -->
+	<blockquote class="bg-surface rounded px-5 py-4 mb-8 border-l-2 border-ink-5/30 text-ink-3 text-[0.92rem] leading-relaxed italic">
+		Since the publication of this article in 2023, various reinforcement learning methods that provide direct feedback towards this type of problem have apparently helped diffusion models (and similar architectures) better generalize. I still expect the same underlying issues to persist within the models, perhaps in more muted and non-obvious ways. It does not seem we have found a systematic fix for this type of issue.
+	</blockquote>
+
 	<p id="introduction" class="mb-5 text-[17px] leading-relaxed">
 		Text-to-image models can generate "astronaut riding a horse" but struggle with
 		"horse riding an astronaut." Why? We tested whether this reflects <em>training priors</em>&mdash;the

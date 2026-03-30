@@ -25,6 +25,14 @@ export const posts = [
 		tags: ['Brown', 'datasets', 'NLP']
 	},
 	{
+		slug: 'predicting-biases',
+		title: 'Predicting Inductive Biases of Pre-Trained Models',
+		subtitle: 'Feature extractability predicts when fine-tuned models rely on spurious heuristics.',
+		date: '2021',
+		section: 'research',
+		tags: ['Brown', 'ICLR 2021', 'LLMs', 'interpretability']
+	},
+	{
 		slug: 'training-priors',
 		title: 'Training Priors Predict Text-To-Image Model Performance',
 		subtitle: 'Do text-to-image models generalize compositionally or mix-and-match from training?',
