@@ -19,6 +19,7 @@
 	let bpeCanvas = $state();
 	let trainingPriorsCanvas = $state();
 	let predictingBiasesCanvas = $state();
+	let alphatologyCanvas = $state();
 	let lindenmayerCanvas = $state();
 	let playgroundCanvas = $state();
 
@@ -897,6 +898,52 @@
 		});
 	}
 
+	/* ── Alphatology card renderer ── */
+	function renderAlphatologyCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(2022);
+		const pad = 14;
+		const points = [];
+
+		// Hexagonal grid of points mimicking a Hex board
+		const cols = 9, rows = 9;
+		const cellW = (W - 2 * pad) / (cols + 0.5);
+		const cellH = (H - 2 * pad) / rows;
+		const concepts = ['#1E88E5', '#D81B60', '#FFC107', '#004D40'];
+
+		for (let r = 0; r < rows; r++) {
+			for (let c = 0; c < cols; c++) {
+				const xOff = (r % 2) * cellW * 0.5;
+				const x = pad + c * cellW + xOff + cellW * 0.5;
+				const y = pad + r * cellH + cellH * 0.5;
+				// Training progress: cells "activate" from center outward
+				const cx = cols / 2, cy = rows / 2;
+				const dist = Math.sqrt((c - cx) ** 2 + (r - cy) ** 2) / Math.sqrt(cx * cx + cy * cy);
+				const active = rand() > dist * 0.7;
+				const color = active ? concepts[Math.floor(rand() * concepts.length)] : '#c8c0b8';
+				const alpha = active ? 0.5 + rand() * 0.45 : 0.15 + rand() * 0.1;
+				points.push({
+					x: x + (rand() - 0.5) * 4,
+					y: y + (rand() - 0.5) * 4,
+					r: noisy(rand, active ? 1.6 : 0.8, 0.3, 0.4, 2.8),
+					fill: color,
+					alpha
+				});
+			}
+		}
+		// Ambient noise
+		for (let i = 0; i < 15; i++) {
+			points.push({
+				x: pad + rand() * (W - 2 * pad),
+				y: pad + rand() * (H - 2 * pad),
+				r: noisy(rand, 0.4, 0.3, 0.2, 0.7),
+				fill: '#a09888',
+				alpha: 0.1
+			});
+		}
+		drawDelaunay(ctx, W, H, points, { edgeColor: 'rgba(30,136,229,0.08)', centerColor: '#004D40' });
+	}
+
 	/* ── Lindenmayer Systems card renderer ── */
 	function renderLindenmayerCard(canvas) {
 		const { ctx, W, H } = setupCanvas(canvas);
@@ -1013,6 +1060,7 @@
 		if (bpeCanvas) renderBpeCard(bpeCanvas);
 		if (trainingPriorsCanvas) renderTrainingPriorsCard(trainingPriorsCanvas);
 		if (predictingBiasesCanvas) renderPredictingBiasesCard(predictingBiasesCanvas);
+		if (alphatologyCanvas) renderAlphatologyCard(alphatologyCanvas);
 		if (lindenmayerCanvas) renderLindenmayerCard(lindenmayerCanvas);
 		if (playgroundCanvas) renderPlaygroundCard(playgroundCanvas);
 	}
@@ -1086,6 +1134,8 @@
 								<canvas bind:this={listiclesCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'predicting-biases'}
 								<canvas bind:this={predictingBiasesCanvas} class="canvas-fill"></canvas>
+							{:else if post.slug === 'alphatology'}
+								<canvas bind:this={alphatologyCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'training-priors'}
 								<canvas bind:this={trainingPriorsCanvas} class="canvas-fill"></canvas>
 							{:else if post.slug === 'interpretable-rl'}
@@ -1110,8 +1160,8 @@
 							{#each post.tags as tag}
 								<span class="tag"
 								class:tag-affiliation={tag === 'Kensho' || tag === 'Brown'}
-								class:tag-venue={tag === 'ACL 2025' || tag === 'ICLR 2021' || tag === 'Under Review' || tag === 'Shelved'}
-								class:tag-topic={tag !== 'Kensho' && tag !== 'Brown' && tag !== 'ACL 2025' && tag !== 'ICLR 2021' && tag !== 'Under Review' && tag !== 'Shelved'}
+								class:tag-venue={tag === 'ACL 2025' || tag === 'ICLR 2021' || tag === 'NeurIPS 2022' || tag === 'Under Review' || tag === 'Shelved'}
+								class:tag-topic={tag !== 'Kensho' && tag !== 'Brown' && tag !== 'ACL 2025' && tag !== 'ICLR 2021' && tag !== 'NeurIPS 2022' && tag !== 'Under Review' && tag !== 'Shelved'}
 								class:tag-shelved={tag === 'Shelved'}
 							>{tag}</span>
 							{/each}

@@ -41,6 +41,14 @@ export const posts = [
 		tags: ['Brown', 'Shelved', 'text-to-image', 'evaluation']
 	},
 	{
+		slug: 'alphatology',
+		title: 'Evaluation Beyond Task Performance',
+		subtitle: 'Analyzing concepts in AlphaZero in Hex using probing classifiers and behavioral tests.',
+		date: '2022',
+		section: 'research',
+		tags: ['Brown', 'NeurIPS 2022', 'reinforcement learning', 'interpretability']
+	},
+	{
 		slug: 'interpretable-rl',
 		title: 'Towards Interpretable Reinforcement Learning',
 		subtitle: 'Reimplementation for NeurIPS Reproducibility Challenge 2019.',
