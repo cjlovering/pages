@@ -59,36 +59,28 @@
 
 	<!-- ═══ Introduction ═══ -->
 	<p id="introduction" class="mb-5 text-[17px] leading-relaxed">
-		AlphaZero, an approach to reinforcement learning that couples neural networks
-		and Monte Carlo tree search (MCTS), has produced state-of-the-art strategies for
-		traditional board games like chess, Go, shogi, and Hex. While researchers and
-		game commentators have suggested that AlphaZero uses concepts that humans
-		consider important, it is unclear how these concepts are captured in the network.
+		Good performance can mask flaws in deep learning systems. Evaluating systems
+		in terms of task performance alone makes it impossible to know if they are "right
+		for the right reasons" and difficult to predict how they will generalize.
+		The NLP community has developed tools for this&mdash;probing classifiers that
+		inspect internal representations, and behavioral tests that evaluate
+		out-of-distribution generalization. We adapt both techniques to reinforcement
+		learning, studying AlphaZero (AZ) trained to play
+		Hex.<Sidenote id="sn-nlp">Probing classifiers were developed for NLP by
+		<a href="https://aclanthology.org/P18-1198/" class="underline decoration-ink-4/30">Conneau et al.</a>
+		and others;
+		behavioral tests by
+		<a href="https://doi.org/10.1162/tacl_a_00298" class="underline decoration-ink-4/30">Ettinger (2020)</a>.
+		We apply both to a deep RL agent for the first time.</Sidenote>
 	</p>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		Good performance can mask flaws in deep learning systems
-		generally.<Sidenote id="sn-mask">This observation applies across fields.
-		In NLP, models achieve high task accuracy while failing on targeted challenge
-		sets. In RL, agents can play at superhuman levels while demonstrating surprising
-		conceptual gaps.</Sidenote>
-		Evaluating systems in terms of task performance alone makes it impossible to know
-		if systems are "right for the right reasons" and difficult to predict how they will
-		generalize to new situations. Recently, the field of natural language processing (NLP)
-		has begun to develop evaluation techniques that go beyond "just" task
-		performance&mdash;for example, <em>probing classifiers</em> inspect the form of models'
-		internal representations, and <em>behavioral tests</em> evaluate specific types of
-		out-of-distribution generalization.
-	</p>
-
-	<p class="mb-5 text-[17px] leading-relaxed">
-		We investigate AlphaZero's internal representations in the game of Hex using
-		these two evaluation techniques from NLP. Our analyses reveal interesting patterns
-		and generate testable hypotheses about how such models learn in general. For example,
-		we find that MCTS discovers concepts before the neural network learns to encode them.
-		We also find that concepts related to short-term end-game planning are best encoded in
-		the final layers of the model, whereas concepts related to long-term planning are
-		encoded in the middle layers.
+		The main findings: (1) AZ's neural network encodes game concepts that humans
+		consider important, and uses them to win games. (2) Short-term concepts
+		are best encoded in the final layers; long-term concepts in the middle layers.
+		(3) MCTS discovers concepts before the neural network learns to represent
+		them. (4) AZ does not fully master negative concepts&mdash;it will
+		waste moves on cells that cannot impact the game.
 	</p>
 
 	<!-- ═══ Concepts in Hex ═══ -->
@@ -97,54 +89,51 @@
 	</h2>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		Hex is a board game where two players take turns filling cells until one player
-		builds a chain across the board. Unlike Go, there are no captures; once a cell
-		is filled with a piece, the piece stays there for the remainder of the game.
-		Hex cannot end in a tie, and given perfect play, the first player will
-		win.<Sidenote id="sn-hex">Hex has well-studied rules, reasonable computational
-		costs, and can be evaluated against perfect play, making it an ideal experimental
-		vehicle for model probing.</Sidenote>
+		Hex is a board game where two players take turns filling cells until one
+		builds a connecting chain across the board. Unlike Go, there are no captures.
+		Hex cannot end in a tie, and given perfect play, the first player
+		wins.<Sidenote id="sn-hex">We evaluate the top-performing agent trained by
+		<a href="https://arxiv.org/abs/2104.03113" class="underline decoration-ink-4/30">Jones (2021)</a>
+		on a 9&times;9 board: an 8-layer, 512-neuron network with 64 MCTS nodes, achieving
+		a 92% win rate as black against
+		<a href="https://webdocs.cs.ualberta.ca/~hayward/hex/" class="underline decoration-ink-4/30">MoHex</a>.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig1-hex-intro.png" alt="Hex board basics: a winning board for black and short- vs long-term concept examples" maxWidth="600px">
-		<em>Left:</em> An example winning board for black, which connects the black edges
-		together. <em>Center and right:</em> Short- vs long-term concepts. If black plays A
-		or B in the center board, black immediately wins; the <em>bridge</em> concept is
-		relevant in the short-term. In the right board, A and B can help black win only in
-		the long-term.
+	<Figure src="/alphatology/fig1-hex-intro.png" alt="Hex board basics: a winning board for black and short- vs long-term concept examples" maxWidth="580px">
+		<em>(a)</em> A winning board for black, connecting the black edges.
+		<em>(b)</em> Short- vs long-term concepts. If black plays A or B in the center
+		board, black immediately wins (short-term). In the right board, A and B can
+		help black win only in the long-term.
 	</Figure>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		In Hex, certain templates&mdash;patterns of cells&mdash;have been recognized as useful.
-		A key part of learning how to play Hex is recognizing when it is possible to connect
-		groups of pieces together. We consider these templates to be <em>concepts</em> within
-		the game. We define a concept to be <strong>short-term</strong> if its use is sufficient
+		We define a concept to be <strong>short-term</strong> if its use is sufficient
 		to win the game (typically when connected to the player's board edges), and
-		<strong>long-term</strong> otherwise.
+		<strong>long-term</strong> otherwise. From Seymour and King, we identify nine
+		concepts in four categories:
 	</p>
 
-	<p class="mb-5 text-[17px] leading-relaxed">
-		From Seymour and King, we identify nine concepts that fall into four categories.
-		<strong>Internal concepts</strong> (bridge, crescent, trapezoid, span) are templates
-		that appear within the interior of the board and provide several possibilities
-		to connect a player's pieces.
-		<strong>Edge concepts</strong> concern connecting a single cell to a given edge.
-		<strong>Ladder concepts</strong> (bottleneck, escape) are analogous to ladders in
-		Go&mdash;a bottleneck favors the defender because the attacker cannot break through,
-		while an escape allows the attacker to break through.
-		<strong>Negative concepts</strong> (dead cells, captured cells) identify which
-		actions <em>not</em> to play rather than which to play. Dead cells cannot impact the
-		outcome of the game regardless of the color with which they are
-		filled.<Sidenote id="sn-neg">If a player can <em>make</em> a cell dead, that
-		cell is captured. Both captured and dead cells should never be filled.</Sidenote>
-	</p>
+	<ul class="mb-5 text-[17px] leading-relaxed list-none pl-0 space-y-2">
+		<li><strong>Internal concepts</strong> (bridge, crescent, trapezoid, span) &mdash;
+			templates within the board's interior providing multiple ways to connect a
+			player's pieces.</li>
+		<li><strong>Edge concepts</strong> &mdash; guarantee a connection from a single cell
+			to a given board edge.</li>
+		<li><strong>Ladder concepts</strong> (bottleneck, escape) &mdash; analogous to
+			ladders in Go. A bottleneck favors the defender; an escape allows the
+			attacker to break through.</li>
+		<li><strong>Negative concepts</strong> (dead cells, captured cells) &mdash;
+			identify which actions <em>not</em> to play. Dead cells cannot impact the
+			game's outcome regardless of how they are
+			filled.<Sidenote id="sn-neg">If a player can <em>make</em> a cell dead,
+			that cell is captured. Both should never be filled.</Sidenote></li>
+	</ul>
 
-	<Figure src="/alphatology/fig2-concepts.png" alt="Hex concept taxonomy showing bridge, crescent, trapezoid, span, edge, bottleneck, escape, dead cells, and captured cells" maxWidth="660px">
+	<Figure src="/alphatology/fig2-concepts.png" alt="Hex concept taxonomy: bridge, crescent, trapezoid, span, edge, bottleneck, escape, dead cells, captured cells" maxWidth="660px">
 		Hex templates exemplifying game concepts. Positive concepts provide the player
-		with multiple ways to connect pieces despite possible attacks from the opponent.
-		Negative concepts change the strategic value of specific open spots of the board.
-		Arrows indicate that the piece is connected to the opposite side of the board; the
-		lines show the bridge concept within the other concepts.
+		with multiple ways to connect pieces despite possible attacks. Negative concepts
+		change the strategic value of open spots. Arrows indicate connection to the
+		opposite board edge; lines show the bridge concept within larger concepts.
 	</Figure>
 
 	<!-- ═══ Evaluation Methods ═══ -->
@@ -153,38 +142,28 @@
 	</h2>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		To understand the concepts encoded within AlphaZero, we use two complementary
-		evaluation techniques.
-	</p>
-
-	<p class="mb-5 text-[17px] leading-relaxed">
 		<strong>Probing classifiers</strong> ask whether concepts are <em>represented</em>
-		within the model. Each concept is defined by a set of boards with vs. without that
-		concept. We train and evaluate linear probes over AlphaZero's internal activations
-		to predict concept presence. To control for surface-level features, we measure
-		<em>concept selectivity</em>&mdash;the delta between probing accuracy and a random
-		control that shuffles cell positions so that the resulting boards are meaningless in
-		Hex.<Sidenote id="sn-selectivity">We follow Hewitt and Liang's procedure to
-		measure concept selectivity. The selectivity baseline randomly maps board pieces
-		so that the new boards do not contain structures known to be relevant to
-		Hex.</Sidenote>
+		within the model. For each concept, we generate boards with vs. without that concept
+		and train linear probes over AZ's internal activations to predict concept presence.
+		We measure <em>concept selectivity</em>&mdash;the delta between probing accuracy and
+		a control that shuffles cell positions so the resulting boards are meaningless in
+		Hex.<Sidenote id="sn-selectivity">Following
+		<a href="https://aclanthology.org/D19-1275/" class="underline decoration-ink-4/30">Hewitt and Liang (2019)</a>,
+		we form the control by consistently remapping each cell to a random cell, preserving
+		the information content while destroying spatial structure.</Sidenote>
 	</p>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
 		<strong>Behavioral tests</strong> ask whether the model <em>uses</em> concepts in
-		gameplay. For positive concepts, we construct forced situations: if AZ understands
-		the concept and plays the expected moves, AZ will win and pass the test; otherwise,
-		AZ will lose the game and fail the test. For negative concepts, we check that during
-		a selfplay continuation of a board containing a dead (or captured) cell, the agent
-		does not fill that cell.
+		gameplay. For positive concepts, we construct forced situations: if AZ plays the
+		expected moves, AZ wins; otherwise, AZ loses. For negative concepts, we check
+		that during a selfplay continuation, the agent does not fill dead or captured cells.
 	</p>
 
-	<Figure src="/alphatology/fig3-behavioral-tests.png" alt="Creating behavioral tests from concept templates in four steps" maxWidth="550px">
-		Creating behavioral tests from concept templates. The minimal template (a)
-		is translated to a random position on the board (b). Then both players' pieces
-		are connected to their respective edges (c). Finally, noise pieces are added to
-		form a valid board (d). Cells A and B define the forced line: if white plays A,
-		black must play B to win.
+	<Figure src="/alphatology/fig3-behavioral-tests.png" alt="Creating behavioral tests from concept templates in four steps" maxWidth="520px">
+		Creating behavioral tests. The minimal template (a) is translated to a random
+		board position (b). Both players' pieces are connected to their edges (c).
+		Noise pieces form a valid board (d). If white plays A, black must play B to win.
 	</Figure>
 
 	<!-- ═══ AZ Encodes Concepts ═══ -->
@@ -193,29 +172,27 @@
 	</h2>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		AZ successfully encodes both long-term and short-term concepts with high
-		selectivity. The probing classifiers detect these concepts well above the selectivity
-		baseline, confirming that concept-specific information is present in the network's
-		internal representations&mdash;not just surface-level board features.
+		AZ encodes both long-term and short-term concepts with high selectivity&mdash;well
+		above the shuffled baseline, confirming that concept-specific information is present
+		in the network's representations, not just surface-level board features.
 	</p>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		Perhaps more interesting is <em>where</em> in the network these concepts live.
-		Long-term concepts are best represented in the middle layers of the network, whereas
-		short-term concepts are best represented in the final layers. This parallels findings
-		in NLP, where different types of linguistic information are encoded at different
-		depths.<Sidenote id="sn-layers">Concurrent work by McGrath et al. on chess found
-		a consistent pattern: short-term concepts (their Fig. 2 [c,e,f]) are better
-		represented in higher layers than long-term concepts (Fig. 2
-		[a,g,h,i]).</Sidenote>
+		More interesting is <em>where</em> in the network these concepts live. Long-term
+		concepts are best represented in the middle layers; short-term concepts in the final
+		layers. This parallels findings in NLP, where syntactic information tends to peak
+		in middle layers while task-specific features concentrate in upper
+		layers.<Sidenote id="sn-layers">Concurrent work by
+		<a href="https://arxiv.org/abs/2111.09259" class="underline decoration-ink-4/30">McGrath et al.</a>
+		on chess found a consistent pattern: short-term concepts are better represented in
+		higher layers than long-term concepts.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig4-probing.png" alt="Probing performance showing concept selectivity and layer-wise distribution" maxWidth="660px">
-		<em>Left:</em> Probing selectivity for long-term and short-term concepts.
-		The colored bars show the accuracy of a probe trained to identify a concept,
-		minus a selectivity baseline. <em>Right:</em> Long-term concepts are best
-		represented in the middle layers; short-term concepts in the final layers.
-		Each distribution shows which layer the probe achieved highest accuracy.
+	<Figure src="/alphatology/fig4-probing.png" alt="Probing performance: concept selectivity and layer-wise distribution" maxWidth="660px">
+		<em>Left:</em> Probing selectivity for long-term and short-term concepts. Colored
+		bars show probe accuracy; grey bars show the selectivity baseline.
+		<em>Right:</em> Layer distribution of best probe accuracy. Long-term concepts peak
+		in the middle layers; short-term concepts in the final layers.
 	</Figure>
 
 	<!-- ═══ AZ Learns to Use Concepts ═══ -->
@@ -224,44 +201,36 @@
 	</h2>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		AZ improves on the behavioral tests about 50% of the way through training. The
-		MCTS passing rates increase before the policy network passing rates, though it need
-		not have been the case&mdash;it is possible for the network body to start representing
-		concepts before MCTS uses them, for instance via the value function signal.
+		AZ improves on the behavioral tests about 50% of the way through training. MCTS
+		passing rates increase before the policy network rates&mdash;the blue Z-score line,
+		which reports the proportion of cases where the correct action's logit is more than
+		one standard deviation above the mean, rises earliest. This suggests
+		"pre-conceptual" information is learned and coalesces into actionable understanding
+		around 60% of the way through training.
 	</p>
 
-	<p class="mb-5 text-[17px] leading-relaxed">
-		The relative magnitude of the correct action logits initially increases earlier.
-		The Z-score line reports the proportion of cases where the correct action's logit
-		is more than one standard deviation above the mean. This trend suggests
-		"pre-conceptual" information is learned, and coalesces&mdash;for bridge, around
-		60% of the way through training&mdash;into an actionable understanding of the
-		concept.<Sidenote id="sn-preconceptual">In Section 4.4 of the paper, we
-		investigate further and find that this "pre-conceptual" information is not
-		board structure.</Sidenote>
-	</p>
-
-	<Figure src="/alphatology/fig5a-positive-curves.png" alt="Learning curves showing AlphaZero acquiring positive concepts over training" maxWidth="550px">
-		AlphaZero learns to use positive concepts. At each checkpoint, we test AZ's
-		ability to utilize each concept. MCTS and the policy network both select actions
-		that pass our behavioral tests with increasing frequency throughout training.
-		The blue line reports the rate at which the correct action's logit Z-score exceeds 1.
+	<Figure src="/alphatology/fig5a-positive-curves.png" alt="Learning curves showing AlphaZero acquiring positive concepts" maxWidth="580px">
+		AZ learns to use positive concepts. At each training checkpoint, we test each
+		concept. MCTS and the policy network both pass behavioral tests with increasing
+		frequency. The blue line tracks the MCTS Z-score > 1 rate.
 	</Figure>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
 		AZ also improves on negative concepts, but does not reach a perfect passing rate.
-		The probing performance for negative concepts is also lower than for other concepts.
-		This aligns with evidence that AZ wastes moves at the end of the game. This
-		highlights a weakness in AlphaZero and a risk: some concepts may be "provable" and
-		useful to people, but "deemed" less important by AZ&mdash;an agent that plays
-		remarkably well.
+		At the end of training, AZ still plays moves in ~25% of behavioral tests that will
+		not impact the game. This is likely because AZ's loss function has no term to
+		encourage winning <em>quickly</em>&mdash;only winning. When all value estimates are
+		high, AZ sees little distinction between efficient and inefficient paths to
+		victory.<Sidenote id="sn-wasted">In one hand-analyzed example from selfplay, AZ
+		placed higher probability on a move that extended the game rather than the move that
+		would win immediately, because both had action values above 0.98. MoHex, by contrast,
+		is hard-coded to connect pieces as quickly as possible.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig5b-negative-curves.png" alt="Negative concept learning curves showing incomplete mastery" maxWidth="280px">
-		AZ does not fully use the negative concepts. <em>Passed</em> denotes the rate
-		at which AZ avoids the negative concept throughout selfplay rollouts. At the end
-		of training, AZ still plays moves in 25% of behavioral tests that will not impact
-		the game.
+	<Figure src="/alphatology/fig5b-negative-curves.png" alt="Negative concept learning curves" maxWidth="280px">
+		AZ does not fully use negative concepts. <em>Passed</em> denotes the rate at which
+		AZ avoids the negative concept throughout selfplay. Even at the end of training,
+		~25% of moves are wasted.
 	</Figure>
 
 	<!-- ═══ Learning Dynamics ═══ -->
@@ -270,32 +239,23 @@
 	</h2>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		Where the network body processes board configurations, MCTS directly governs the
-		decision-making process. In principle, either module could be the first to discover
-		game concepts. We find that the first improvements in behavioral tests precede the
-		first improvements in probing accuracy. MCTS seems to discover concepts,
-		especially the internal concepts. Then, as the policy network is trained to match the
-		MCTS logits, the concept representation is absorbed into the network.
+		MCTS directly governs decision-making; the network body processes board
+		configurations. In principle, either could discover game concepts first. We find that
+		improvements in behavioral tests (driven by MCTS) precede improvements in probing
+		accuracy (driven by the network). MCTS discovers concepts first; then, as the policy
+		network is trained to match the MCTS logits, the concept representation is absorbed
+		into the network.<Sidenote id="sn-curriculum">While behavioral tests start to
+		improve before probing, both converge near the end of training. Exception: the
+		ladder escape and bottleneck concepts are easy for probes to detect&mdash;perhaps
+		because they occur along board edges and have fewer possible
+		configurations.</Sidenote>
 	</p>
 
-	<p class="mb-5 text-[17px] leading-relaxed">
-		We also find evidence that the structure of the board is first learned at about the
-		same time other concepts are learned. This suggests that AZ does not learn concepts
-		according to an obvious order or curriculum, but rather, concepts of differing levels
-		of complexity develop in parallel.<Sidenote id="sn-curriculum">While behavioral
-		tests start to improve before probing, they both converge near the end of training.
-		Exception: the ladder escape and bottleneck concepts are easy for the probes to
-		detect, perhaps because they occur along the edges of the board and have fewer
-		possible configurations.</Sidenote>
-	</p>
-
-	<Figure src="/alphatology/fig6-timeline.png" alt="Timeline showing behavioral tests improve before probing accuracy across all concepts" maxWidth="660px">
+	<Figure src="/alphatology/fig6-timeline.png" alt="Timeline: behavioral tests improve before probing accuracy" maxWidth="660px">
 		Improvements in behavioral tests occur before improvements in probing accuracy.
-		Each point marks the mean checkpoint in training that AZ started to learn (or
-		converge upon) the behavioral (or probing) test. While behavioral tests start to
-		improve before probing, they both converge near the end of training. The
-		<em>structural</em> column evaluates how well AZ's cell embeddings capture Hex's
-		neighborhood structure.
+		Each point marks the mean training checkpoint at which AZ started to learn (or
+		converge upon) each evaluation. Concepts of differing complexity develop in
+		parallel rather than following an obvious curriculum.
 	</Figure>
 
 	<!-- ═══ Board Structure ═══ -->
@@ -304,46 +264,28 @@
 	</h2>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		Understanding Hex's concepts requires understanding the board's structure&mdash;which
-		cells connect to which other cells. AlphaZero, with its feed-forward network
-		architecture, does not <em>a priori</em> represent this structure. We hypothesized
-		that the structure of Hex's board is implicitly learned by AZ's first layer.
+		Understanding Hex's concepts requires understanding the board's
+		structure&mdash;which cells connect to which. AZ's feed-forward architecture does
+		not <em>a priori</em> represent this. We extract cell embeddings from AZ's first
+		layer and compute dot-product similarities. The nearest neighbors according to
+		these scores nearly match the ground-truth hexagonal neighborhood by the
+		15th of 20 training checkpoints.<Sidenote id="sn-ndcg">We evaluate alignment
+		via Normalized Discounted Cumulative Gain (NDCG). The NDCG first improves
+		about 50% of the way through training&mdash;notably, only <em>after</em> the first
+		improvements in behavioral tests, ruling out a simple "first learn the board,
+		then learn concepts" narrative.</Sidenote>
 	</p>
 
-	<p class="mb-5 text-[17px] leading-relaxed">
-		For each Hex cell, we extract a cell embedding from the first layer of AZ. We then
-		compute the dot products between each cell embedding. The dot-product score between
-		ground-truth neighbors increases throughout AZ's training. The nearest neighbors
-		(according to the dot-product scores) nearly match the ground truth by the 15th of
-		20 checkpoints, and eventually match the ground truth before deviating
-		slightly.<Sidenote id="sn-ndcg">We evaluate how well the dot-product scores
-		align with the ground-truth cell distances via Normalized Discounted Cumulative
-		Gain (NDCG). The NDCG first improves about 50% of the way through
-		training.</Sidenote>
-	</p>
-
-	<Figure src="/alphatology/fig7-board-structure.png" alt="Implicit board structure learned by AlphaZero showing nearest neighbor arrows" maxWidth="300px">
-		Implicit board structure. Arrows mark the learned nearest neighbors of each
-		cell, based on dot-product similarity of cell embeddings in the first layer.
-		The learned structure closely matches the true hexagonal neighborhood by the
-		end of training.
+	<Figure src="/alphatology/fig7-board-structure.png" alt="Learned implicit board structure showing nearest-neighbor arrows" maxWidth="350px">
+		Implicit board structure. Each grey circle is a Hex cell; arrows mark the learned
+		nearest neighbors from dot-product similarity of first-layer embeddings. The learned
+		structure closely recovers the true hexagonal neighborhood.
 	</Figure>
-
-	<p class="mb-5 text-[17px] leading-relaxed">
-		However, we find no evidence that the neighborhood structure is learned in the
-		initial stages of training. Rather, it appears to be learned only after the first
-		improvements in behavioral tests. This rules out a simple "first learn the board,
-		then learn concepts" narrative.
-	</p>
 
 	<!-- ═══ Citation ═══ -->
 	<h2 id="citation" class="text-[1.45rem] font-semibold mt-12 mb-4 leading-snug relative">
 		<span>Citation<a href="#citation" class="heading-anchor">#</a></span>
 	</h2>
-
-	<p class="mb-5 text-[17px] leading-relaxed">
-		Report prepared by Charles Lovering.
-	</p>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
 		See more details in our paper,
@@ -353,17 +295,17 @@
 	</p>
 
 	<pre class="bg-surface-code rounded text-[13px] leading-snug p-4 overflow-x-auto font-mono text-ink-3"><code>@inproceedings&#123;lovering2022evaluation,
-    title = "Evaluation Beyond Task Performance:
-             Analyzing Concepts in AlphaZero in Hex",
-    author = "Lovering, Charles and
-      Forde, Jessica Zosa and
-      Konidaris, George and
-      Pavlick, Ellie and
-      Littman, Michael L.",
+    title     = "Evaluation Beyond Task Performance:
+                 Analyzing Concepts in &#123;A&#125;lpha&#123;Z&#125;ero
+                 in &#123;H&#125;ex",
+    author    = "Lovering, Charles and
+                 Forde, Jessica Zosa and
+                 Konidaris, George and
+                 Pavlick, Ellie and
+                 Littman, Michael L.",
     booktitle = "Advances in Neural Information
                  Processing Systems",
-    year = "2022",
-    url = "https://proceedings.neurips.cc/paper_files/paper/2022/hash/79bf4400e1e4e6b209650e3c06e5e9e6-Abstract-Conference.html",
+    year      = "2022",
 &#125;</code></pre>
 
 </article>
