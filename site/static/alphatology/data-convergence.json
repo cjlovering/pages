@@ -1,0 +1,44 @@
+[
+  {
+    "concept": "bridge",
+    "behavioral": 14,
+    "probing": 18
+  },
+  {
+    "concept": "crescent",
+    "behavioral": 14,
+    "probing": 16
+  },
+  {
+    "concept": "trapezoid",
+    "behavioral": 15,
+    "probing": 15
+  },
+  {
+    "concept": "span",
+    "behavioral": 16,
+    "probing": 16
+  },
+  {
+    "concept": "edge",
+    "behavioral": 16
+  },
+  {
+    "concept": "bottleneck",
+    "behavioral": 16,
+    "probing": 14
+  },
+  {
+    "concept": "escape",
+    "behavioral": 16,
+    "probing": 16
+  },
+  {
+    "concept": "dead",
+    "probing": 17
+  },
+  {
+    "concept": "captured",
+    "probing": 18
+  }
+]

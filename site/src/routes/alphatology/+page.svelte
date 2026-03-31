@@ -2,6 +2,13 @@
 	import Toc from '$lib/components/Toc.svelte';
 	import Sidenote from '$lib/components/Sidenote.svelte';
 	import Figure from '$lib/components/Figure.svelte';
+	import {
+		ProbingChart,
+		LearningCurves,
+		NegativeCurves,
+		ConvergenceChart,
+		BoardAnimation
+	} from '$lib/charts/alphatology';
 
 	const tocItems = [
 		{ label: 'Introduction', href: '#introduction' },
@@ -13,6 +20,35 @@
 		{ label: 'Board structure', href: '#structure' },
 		{ label: 'Citation', href: '#citation' },
 	];
+
+	// ── Chart data (loaded as static JSON) ──
+	let probingData = $state(null);
+	let positiveCurves = $state(null);
+	let negativeCurves = $state(null);
+	let convergenceData = $state(null);
+	let structureData = $state(null);
+
+	async function loadJson(path) {
+		const res = await fetch(path);
+		return res.json();
+	}
+
+	$effect(() => {
+		loadJson('/alphatology/data-probing.json').then(d => probingData = d);
+		loadJson('/alphatology/data-positive-curves.json').then(d => positiveCurves = d);
+		loadJson('/alphatology/data-negative-curves.json').then(d => negativeCurves = d);
+		loadJson('/alphatology/data-convergence.json').then(d => convergenceData = d);
+		loadJson('/alphatology/data-structure.json').then(d => structureData = d);
+	});
+
+	const boardFrames = [
+		{ src: '/alphatology/board-grubby-0.png', checkpoint: 0 },
+		{ src: '/alphatology/board-grubby-10.png', checkpoint: 10 },
+		{ src: '/alphatology/board-grubby-15.png', checkpoint: 15 },
+		{ src: '/alphatology/board-grubby-20.png', checkpoint: 20 },
+	];
+
+	const positiveConcepts = ['bridge', 'crescent', 'trapezoid', 'span', 'edge', 'bottleneck', 'escape'];
 </script>
 
 <svelte:head>
@@ -34,11 +70,11 @@
 	<div class="flex flex-wrap gap-2 mb-14">
 		<a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/79bf4400e1e4e6b209650e3c06e5e9e6-Abstract-Conference.html" target="_blank" rel="noopener noreferrer"
 			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			📄 Paper
+			Paper
 		</a>
 		<a href="https://github.com/jzf2101/alphatology" target="_blank" rel="noopener noreferrer"
 			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			💻 Code
+			Code
 		</a>
 	</div>
 </div>
@@ -188,12 +224,17 @@
 		higher layers than long-term concepts.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig4-probing.png" alt="Probing performance: concept selectivity and layer-wise distribution" maxWidth="660px">
-		<em>Left:</em> Probing selectivity for long-term and short-term concepts. Colored
-		bars show probe accuracy; grey bars show the selectivity baseline.
-		<em>Right:</em> Layer distribution of best probe accuracy. Long-term concepts peak
-		in the middle layers; short-term concepts in the final layers.
-	</Figure>
+	{#if probingData}
+		<figure class="my-8 [counter-increment:figure-counter]">
+			<ProbingChart data={probingData} height={320} />
+			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
+				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+				Probing selectivity (bars, left axis) and best network layer (dots, right axis)
+				for each concept at the final training checkpoint. Long-term concepts peak in
+				middle layers (4–8); short-term concepts peak in the final layers (8–9).
+			</figcaption>
+		</figure>
+	{/if}
 
 	<!-- ═══ AZ Learns to Use Concepts ═══ -->
 	<h2 id="behavioral" class="text-[1.45rem] font-semibold mt-12 mb-4 leading-snug relative">
@@ -202,18 +243,24 @@
 
 	<p class="mb-5 text-[17px] leading-relaxed">
 		AZ improves on the behavioral tests about 50% of the way through training. MCTS
-		passing rates increase before the policy network rates&mdash;the blue Z-score line,
+		passing rates increase before the policy network rates&mdash;the solid line,
 		which reports the proportion of cases where the correct action's logit is more than
 		one standard deviation above the mean, rises earliest. This suggests
 		"pre-conceptual" information is learned and coalesces into actionable understanding
 		around 60% of the way through training.
 	</p>
 
-	<Figure src="/alphatology/fig5a-positive-curves.png" alt="Learning curves showing AlphaZero acquiring positive concepts" maxWidth="580px">
-		AZ learns to use positive concepts. At each training checkpoint, we test each
-		concept. MCTS and the policy network both pass behavioral tests with increasing
-		frequency. The blue line tracks the MCTS Z-score > 1 rate.
-	</Figure>
+	{#if positiveCurves}
+		<figure class="my-8 [counter-increment:figure-counter]">
+			<LearningCurves data={positiveCurves} concepts={positiveConcepts} height={440} />
+			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
+				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+				Learning curves for positive concepts. At each training checkpoint, we test
+				whether AZ plays the concept-expected move (Z &gt; 1). Solid: MCTS; dashed:
+				policy network. Both rise sharply around checkpoint 10–14.
+			</figcaption>
+		</figure>
+	{/if}
 
 	<p class="mb-5 text-[17px] leading-relaxed">
 		AZ also improves on negative concepts, but does not reach a perfect passing rate.
@@ -227,11 +274,16 @@
 		is hard-coded to connect pieces as quickly as possible.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig5b-negative-curves.png" alt="Negative concept learning curves" maxWidth="280px">
-		AZ does not fully use negative concepts. <em>Passed</em> denotes the rate at which
-		AZ avoids the negative concept throughout selfplay. Even at the end of training,
-		~25% of moves are wasted.
-	</Figure>
+	{#if negativeCurves}
+		<figure class="my-8 [counter-increment:figure-counter]">
+			<NegativeCurves data={negativeCurves} height={240} />
+			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
+				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+				Negative concept pass rates. <em>Passed</em> = AZ avoids dead/captured cells
+				throughout selfplay. Even fully trained, ~25% of moves are wasted.
+			</figcaption>
+		</figure>
+	{/if}
 
 	<!-- ═══ Learning Dynamics ═══ -->
 	<h2 id="dynamics" class="text-[1.45rem] font-semibold mt-12 mb-4 leading-snug relative">
@@ -251,12 +303,17 @@
 		configurations.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig6-timeline.png" alt="Timeline: behavioral tests improve before probing accuracy" maxWidth="660px">
-		Improvements in behavioral tests occur before improvements in probing accuracy.
-		Each point marks the mean training checkpoint at which AZ started to learn (or
-		converge upon) each evaluation. Concepts of differing complexity develop in
-		parallel rather than following an obvious curriculum.
-	</Figure>
+	{#if convergenceData}
+		<figure class="my-8 [counter-increment:figure-counter]">
+			<ConvergenceChart data={convergenceData} height={300} />
+			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
+				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+				Behavioral convergence (filled dots) vs. probing convergence (open dots).
+				For most concepts, behavioral tests improve before probing accuracy,
+				confirming that MCTS discovers concepts before the network internalizes them.
+			</figcaption>
+		</figure>
+	{/if}
 
 	<!-- ═══ Board Structure ═══ -->
 	<h2 id="structure" class="text-[1.45rem] font-semibold mt-12 mb-4 leading-snug relative">
@@ -276,11 +333,22 @@
 		then learn concepts" narrative.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig7-board-structure.png" alt="Learned implicit board structure showing nearest-neighbor arrows" maxWidth="350px">
-		Implicit board structure. Each grey circle is a Hex cell; arrows mark the learned
-		nearest neighbors from dot-product similarity of first-layer embeddings. The learned
-		structure closely recovers the true hexagonal neighborhood.
-	</Figure>
+	{#if structureData}
+		<figure class="my-8 [counter-increment:figure-counter]">
+			<BoardAnimation
+				frames={boardFrames}
+				{structureData}
+				imgSize={400}
+			/>
+			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
+				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+				Implicit board structure emerging during training. Each grey circle is a Hex
+				cell; arrows show learned nearest neighbors from first-layer embeddings.
+				At checkpoint 0, arrows are random; by checkpoint 20, the hexagonal grid
+				is recovered. The NDCG curve (below) tracks alignment with ground truth.
+			</figcaption>
+		</figure>
+	{/if}
 
 	<!-- ═══ Citation ═══ -->
 	<h2 id="citation" class="text-[1.45rem] font-semibold mt-12 mb-4 leading-snug relative">

@@ -1,0 +1,70 @@
+{
+  "selectivity": [
+    {
+      "concept": "bridge",
+      "selectivity": 0.2045,
+      "std": 0.0166,
+      "bestLayer": 8
+    },
+    {
+      "concept": "crescent",
+      "selectivity": 0.2493,
+      "std": 0.0126,
+      "bestLayer": 9
+    },
+    {
+      "concept": "trapezoid",
+      "selectivity": 0.1943,
+      "std": 0.0135,
+      "bestLayer": 7
+    },
+    {
+      "concept": "span",
+      "selectivity": 0.1747,
+      "std": 0.0136,
+      "bestLayer": 9
+    },
+    {
+      "concept": "bottleneck",
+      "selectivity": 0.0139,
+      "std": 0.0091,
+      "bestLayer": 9
+    },
+    {
+      "concept": "escape",
+      "selectivity": 0.0228,
+      "std": 0.013,
+      "bestLayer": 8
+    },
+    {
+      "concept": "dead",
+      "selectivity": 0.1626,
+      "std": 0.0156,
+      "bestLayer": 4
+    },
+    {
+      "concept": "captured",
+      "selectivity": 0.1718,
+      "std": 0.0147,
+      "bestLayer": 8
+    }
+  ],
+  "layerHistogram": [
+    {
+      "layer": 4,
+      "count": 1
+    },
+    {
+      "layer": 7,
+      "count": 1
+    },
+    {
+      "layer": 8,
+      "count": 3
+    },
+    {
+      "layer": 9,
+      "count": 3
+    }
+  ]
+}
