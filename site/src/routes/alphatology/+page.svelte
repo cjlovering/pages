@@ -7,7 +7,8 @@
 		LearningCurves,
 		NegativeCurves,
 		ConvergenceChart,
-		BoardAnimation
+		BoardAnimation,
+		HexBoard
 	} from '$lib/charts/alphatology';
 
 	const tocItems = [
@@ -27,6 +28,7 @@
 	let negativeCurves = $state(null);
 	let convergenceData = $state(null);
 	let structureData = $state(null);
+	let boardCellData = $state(null);
 
 	async function loadJson(path) {
 		const res = await fetch(path);
@@ -39,6 +41,7 @@
 		loadJson('/alphatology/data-negative-curves.json').then(d => negativeCurves = d);
 		loadJson('/alphatology/data-convergence.json').then(d => convergenceData = d);
 		loadJson('/alphatology/data-structure.json').then(d => structureData = d);
+		loadJson('/alphatology/data-board-cells.json').then(d => boardCellData = d);
 	});
 
 	const boardFrames = [
@@ -342,10 +345,23 @@
 			/>
 			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
 				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
-				Implicit board structure emerging during training. Each grey circle is a Hex
-				cell; arrows show learned nearest neighbors from first-layer embeddings.
-				At checkpoint 0, arrows are random; by checkpoint 20, the hexagonal grid
-				is recovered. The NDCG curve (below) tracks alignment with ground truth.
+				Implicit board structure emerging during training (original). Each grey
+				circle is a Hex cell; arrows show learned nearest neighbors from
+				first-layer embeddings. At checkpoint 0, arrows are random; by
+				checkpoint 20, the hexagonal grid is recovered.
+			</figcaption>
+		</figure>
+	{/if}
+
+	{#if boardCellData}
+		<figure class="my-8 [counter-increment:figure-counter]">
+			<HexBoard cellData={boardCellData} size={420} />
+			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
+				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+				Reconstructed board structure from per-cell overlap scores (D3). Arrows
+				to true hex neighbors fade in as overlap increases; noise arrows to
+				random cells fade out. Cells color from grey to red with overlap.
+				All 20 checkpoints are available via the slider.
 			</figcaption>
 		</figure>
 	{/if}

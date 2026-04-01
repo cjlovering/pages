@@ -3,4 +3,5 @@ export { default as LearningCurves } from './LearningCurves.svelte';
 export { default as NegativeCurves } from './NegativeCurves.svelte';
 export { default as ConvergenceChart } from './ConvergenceChart.svelte';
 export { default as BoardAnimation } from './BoardAnimation.svelte';
+export { default as HexBoard } from './HexBoard.svelte';
 export { theme, styleAxis, conceptScale } from './theme.js';
