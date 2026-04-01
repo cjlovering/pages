@@ -24,6 +24,7 @@
 	let checkpoint = $state(0);
 	let playing = $state(true);
 	let hoveredCell = $state(-1);
+	let colorMetric = $state('ndcg'); // 'ndcg' | 'overlap'
 
 	let checkpoints = $derived(
 		cellData ? Object.keys(cellData.overlap).map(Number).sort((a, b) => a - b) : []
@@ -36,20 +37,41 @@
 		return () => ro.disconnect();
 	});
 
+	// Auto-play — 1200ms interval
 	$effect(() => {
 		if (playing && checkpoints.length > 1) {
 			const id = setInterval(() => {
 				const idx = checkpoints.indexOf(checkpoint);
 				checkpoint = checkpoints[(idx + 1) % checkpoints.length];
-			}, 1800);
+			}, 1200);
 			return () => clearInterval(id);
 		}
+	});
+
+	// Arrow key navigation
+	$effect(() => {
+		if (!wrapper) return;
+		function onKey(e) {
+			if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+				e.preventDefault();
+				playing = false;
+				const idx = checkpoints.indexOf(checkpoint);
+				if (e.key === 'ArrowRight' && idx < checkpoints.length - 1) {
+					checkpoint = checkpoints[idx + 1];
+				} else if (e.key === 'ArrowLeft' && idx > 0) {
+					checkpoint = checkpoints[idx - 1];
+				}
+			}
+		}
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
 	});
 
 	$effect(() => {
 		if (!wrapper || w === 0 || !cellData) return;
 		void checkpoint;
 		void hoveredCell;
+		void colorMetric;
 		renderBoard();
 	});
 
@@ -60,9 +82,6 @@
 	});
 
 	// ── Hex geometry (matches source: neighbors.py) ──
-	// Neighbor directions from the original code:
-	// (r-1, c), (r-1, c+1), (r, c-1), (r, c+1), (r+1, c), (r+1, c-1)
-	// These are axial/offset coords for a parallelogram hex grid.
 	function cellPos(i) {
 		return { row: Math.floor(i / BOARD), col: i % BOARD };
 	}
@@ -78,8 +97,6 @@
 		return result;
 	}
 
-	// Hex center in pixel coords — parallelogram layout (like a real Hex board).
-	// Each row shifts right by half a cell width, forming the diamond shape.
 	function hexCenter(row, col, r) {
 		const h = r * Math.sqrt(3);
 		const x = col * h + row * h * 0.5;
@@ -95,7 +112,6 @@
 		const { row, col } = cellPos(i);
 		const nb = trueNeighbors(row, col);
 		neighborMap.push(nb);
-
 		const nbSet = new Set(nb);
 		nbSet.add(i);
 		const cands = [];
@@ -105,7 +121,6 @@
 		allNonNeighbors.push(cands);
 	}
 
-	// Seeded deterministic shuffle for sampling
 	function seededShuffle(arr, seed) {
 		const rng = d3.randomLcg(seed);
 		const out = arr.slice();
@@ -116,18 +131,14 @@
 		return out;
 	}
 
-	// ── Curved arrow path (quadratic bezier with perpendicular bulge) ──
 	function curvedArrow(from, to, nodeR, bulge = 0.15) {
 		const dx = to.x - from.x, dy = to.y - from.y;
 		const dist = Math.sqrt(dx * dx + dy * dy);
 		if (dist < 1) return '';
 		const ux = dx / dist, uy = dy / dist;
-		// Perpendicular direction
 		const px = -uy, py = ux;
-		// Start/end offset by node radius
 		const x1 = from.x + ux * nodeR, y1 = from.y + uy * nodeR;
 		const x2 = to.x - ux * nodeR, y2 = to.y - uy * nodeR;
-		// Control point: midpoint + perpendicular offset
 		const mx = (x1 + x2) / 2 + px * dist * bulge;
 		const my = (y1 + y2) / 2 + py * dist * bulge;
 		return `M${x1},${y1} Q${mx},${my} ${x2},${y2}`;
@@ -139,14 +150,12 @@
 		const r = (svgSize - 2 * pad) / (BOARD * 2.2);
 		const nodeR = r * 0.30;
 
-		// Compute centers
 		const centers = [];
 		for (let i = 0; i < TOTAL; i++) {
 			const { row, col } = cellPos(i);
 			centers.push(hexCenter(row, col, r));
 		}
 
-		// Center the board in SVG
 		const xs = centers.map(c => c.x), ys = centers.map(c => c.y);
 		const ox = (svgSize - (Math.max(...xs) - Math.min(...xs))) / 2 - Math.min(...xs);
 		const oy = (svgSize - (Math.max(...ys) - Math.min(...ys))) / 2 - Math.min(...ys);
@@ -162,8 +171,6 @@
 		root.selectAll('*').remove();
 
 		const defs = root.append('defs');
-
-		// Arrow markers — two variants: neighbor (dark) and noise (light)
 		for (const [id, fill, sz] of [
 			['arr-nb', theme.ink[1], 4],
 			['arr-noise', theme.ink[5], 3]
@@ -179,8 +186,6 @@
 		const g = root.append('g').attr('transform', `translate(${ox},${oy})`);
 
 		// ── Build arrow data ──
-		// For each cell, sample floor(overlap * numNeighbors) true neighbors,
-		// and (6 - sampled) noise arrows to random non-neighbors.
 		const trueArrows = [];
 		const noiseArrows = [];
 
@@ -188,8 +193,6 @@
 			const ov = overlap[i];
 			const nbs = neighborMap[i];
 			const numTrue = Math.round(ov * nbs.length);
-
-			// Deterministic sample based on checkpoint + cell
 			const shuffledNbs = seededShuffle(nbs, checkpoint * 1000 + i);
 			const shown = shuffledNbs.slice(0, numTrue);
 			const numNoise = nbs.length - numTrue;
@@ -197,7 +200,6 @@
 			for (const nb of shown) {
 				trueArrows.push({ from: i, to: nb });
 			}
-
 			if (numNoise > 0) {
 				const shuffledNon = seededShuffle(allNonNeighbors[i], checkpoint * 1000 + i + 500);
 				for (let k = 0; k < Math.min(numNoise, 4); k++) {
@@ -206,71 +208,60 @@
 			}
 		}
 
-		// ── Draw noise arrows first (behind) ──
+		// ── Noise arrows (behind) ──
 		const meanOv = d3.mean(overlap);
 		const noiseBaseOp = Math.max(0, (1 - meanOv) * 0.22);
 
 		for (const a of noiseArrows) {
 			const from = centers[a.from], to = centers[a.to];
-			// Vary bulge direction for visual variety
 			const bulge = ((a.from + a.to) % 2 === 0 ? 0.08 : -0.08);
 			const d = curvedArrow(from, to, nodeR, bulge);
 			if (!d) continue;
-
 			let op = noiseBaseOp;
 			if (hoveredCell >= 0) op = a.from === hoveredCell ? 0.35 : 0.02;
 
-			g.append('path')
-				.attr('d', d)
-				.attr('fill', 'none')
-				.attr('stroke', theme.ink[5])
-				.attr('stroke-width', 0.4)
-				.attr('opacity', op)
+			g.append('path').attr('d', d)
+				.attr('fill', 'none').attr('stroke', theme.ink[5])
+				.attr('stroke-width', 0.4).attr('opacity', op)
 				.attr('marker-end', 'url(#arr-noise)');
 		}
 
-		// ── Draw true-neighbor arrows ──
+		// ── True-neighbor arrows ──
 		for (const a of trueArrows) {
 			const from = centers[a.from], to = centers[a.to];
 			const bulge = ((a.from + a.to) % 3 === 0 ? 0.12 : -0.12);
 			const d = curvedArrow(from, to, nodeR, bulge);
 			if (!d) continue;
-
-			let op = 0.55;
-			let sw = 0.9;
+			let op = 0.55, sw = 0.9;
 			if (hoveredCell >= 0) {
-				if (a.from === hoveredCell || a.to === hoveredCell) {
-					op = 0.9; sw = 1.6;
-				} else {
-					op = 0.06;
-				}
+				if (a.from === hoveredCell || a.to === hoveredCell) { op = 0.9; sw = 1.6; }
+				else { op = 0.06; }
 			}
-
-			g.append('path')
-				.attr('d', d)
-				.attr('fill', 'none')
-				.attr('stroke', theme.ink[1])
-				.attr('stroke-width', sw)
-				.attr('opacity', op)
+			g.append('path').attr('d', d)
+				.attr('fill', 'none').attr('stroke', theme.ink[1])
+				.attr('stroke-width', sw).attr('opacity', op)
 				.attr('marker-end', 'url(#arr-nb)');
 		}
 
-		// ── Draw cells on top ──
-		// Fill: NDCG-based (how well this cell's neighbor ranking matches ground truth)
-		// Stroke: overlap-based (how many true neighbors recovered)
+		// ── Cells ──
 		const ndcgColor = d3.scaleLinear()
 			.domain([0.88, 1.0]).range(['#f3f1ee', '#AD2111']).clamp(true);
+		const overlapColor = d3.scaleLinear()
+			.domain([0, 1]).range(['#f3f1ee', '#AD2111']).clamp(true);
+		const fillScale = colorMetric === 'ndcg' ? ndcgColor : overlapColor;
+
 		const overlapStroke = d3.scaleLinear()
 			.domain([0, 1]).range([theme.ink[5], theme.ink[0]]);
 
 		for (let i = 0; i < TOTAL; i++) {
 			const c = centers[i];
 			const isHovered = hoveredCell === i;
+			const val = colorMetric === 'ndcg' ? ndcg[i] : overlap[i];
 
 			g.append('circle')
 				.attr('cx', c.x).attr('cy', c.y)
 				.attr('r', isHovered ? nodeR * 1.3 : nodeR)
-				.attr('fill', ndcgColor(ndcg[i]))
+				.attr('fill', fillScale(val))
 				.attr('stroke', isHovered ? theme.ink[0] : overlapStroke(overlap[i]))
 				.attr('stroke-width', isHovered ? 2 : 0.8)
 				.attr('cursor', 'pointer')
@@ -302,6 +293,41 @@
 				.attr('fill', theme.ink[1])
 				.text(`Cell ${hoveredCell}: ${recovered}/${nbs} neighbors, NDCG ${nd.toFixed(3)}`);
 		}
+
+		// ── Color legend (right side of SVG) ──
+		const legX = svgSize - 18;
+		const legY = 30;
+		const legH = 80;
+		const legW = 10;
+
+		// Gradient bar
+		const gradId = 'cell-color-grad';
+		const grad = defs.append('linearGradient').attr('id', gradId)
+			.attr('x1', '0%').attr('y1', '100%').attr('x2', '0%').attr('y2', '0%');
+		grad.append('stop').attr('offset', '0%').attr('stop-color', '#f3f1ee');
+		grad.append('stop').attr('offset', '100%').attr('stop-color', '#AD2111');
+
+		root.append('rect')
+			.attr('x', legX).attr('y', legY)
+			.attr('width', legW).attr('height', legH)
+			.attr('fill', `url(#${gradId})`)
+			.attr('stroke', theme.border.default).attr('stroke-width', 0.5)
+			.attr('rx', 2);
+
+		// Domain labels
+		const domainLo = colorMetric === 'ndcg' ? '0.88' : '0%';
+		const domainHi = colorMetric === 'ndcg' ? '1.00' : '100%';
+
+		root.append('text')
+			.attr('x', legX + legW / 2).attr('y', legY - 4)
+			.attr('text-anchor', 'middle')
+			.attr('font-family', theme.font.sans).attr('font-size', 9)
+			.attr('fill', theme.ink[3]).text(domainHi);
+		root.append('text')
+			.attr('x', legX + legW / 2).attr('y', legY + legH + 10)
+			.attr('text-anchor', 'middle')
+			.attr('font-family', theme.font.sans).attr('font-size', 9)
+			.attr('fill', theme.ink[3]).text(domainLo);
 	}
 
 	function renderChart() {
@@ -336,13 +362,13 @@
 		const line = d3.line().x(d => x(d.x)).y(d => y(d.y)).curve(d3.curveMonotoneX);
 		const area = d3.area().x(d => x(d.x)).y0(ih).y1(d => y(d.y)).curve(d3.curveMonotoneX);
 
-		// Overlap fill + line
+		// Overlap
 		g.append('path').datum(meanOverlap).attr('d', area)
 			.attr('fill', theme.conceptColors.bridge).attr('opacity', 0.08);
 		g.append('path').datum(meanOverlap).attr('d', line)
 			.attr('fill', 'none').attr('stroke', theme.conceptColors.bridge).attr('stroke-width', 1.8);
 
-		// NDCG dashed line
+		// NDCG
 		g.append('path').datum(meanNdcg).attr('d', line)
 			.attr('fill', 'none').attr('stroke', theme.conceptColors.edge)
 			.attr('stroke-width', 1.8).attr('stroke-dasharray', '4,3');
@@ -389,10 +415,11 @@
 	function togglePlay() { playing = !playing; }
 </script>
 
-<div bind:this={wrapper} class="w-full">
+<div bind:this={wrapper} class="w-full" tabindex="0">
 	<div class="hex-svg mx-auto" style="width: {Math.min(size, w)}px;"></div>
 
-	<div class="flex items-center justify-center gap-2 mt-2 mb-1 flex-wrap">
+	<!-- Controls row -->
+	<div class="flex items-center justify-center gap-3 mt-2 mb-1 flex-wrap">
 		<button
 			onclick={togglePlay}
 			class="text-xs font-sans px-2 py-0.5 rounded border border-[#e8e5e0] hover:bg-[#fafaf9] transition-colors"
@@ -409,7 +436,29 @@
 			class="w-40 accent-[#AD2111]"
 		/>
 		<span class="text-xs font-sans text-ink-3 w-6 text-right">{checkpoint}</span>
+
+		<!-- Color metric toggle -->
+		<span class="text-[10px] font-sans text-ink-4 ml-2">Color:</span>
+		<button
+			onclick={() => { colorMetric = 'ndcg'; }}
+			class="text-[11px] font-sans px-1.5 py-0.5 rounded border transition-colors"
+			style="background: {colorMetric === 'ndcg' ? '#282828' : 'transparent'}; color: {colorMetric === 'ndcg' ? '#fff' : '#504945'}; border-color: {colorMetric === 'ndcg' ? '#282828' : '#e8e5e0'};"
+		>
+			NDCG
+		</button>
+		<button
+			onclick={() => { colorMetric = 'overlap'; }}
+			class="text-[11px] font-sans px-1.5 py-0.5 rounded border transition-colors"
+			style="background: {colorMetric === 'overlap' ? '#282828' : 'transparent'}; color: {colorMetric === 'overlap' ? '#fff' : '#504945'}; border-color: {colorMetric === 'overlap' ? '#282828' : '#e8e5e0'};"
+		>
+			Overlap
+		</button>
 	</div>
+
+	<p class="text-center text-[10px] text-ink-4 font-sans mt-0 mb-1">
+		Use <kbd class="px-1 py-0.5 rounded border border-[#e8e5e0] text-[10px]">&larr;</kbd>
+		<kbd class="px-1 py-0.5 rounded border border-[#e8e5e0] text-[10px]">&rarr;</kbd> to step
+	</p>
 
 	<div bind:this={chartWrapper} class="w-full mt-1"></div>
 </div>
