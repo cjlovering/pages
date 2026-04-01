@@ -247,7 +247,7 @@
 		const ndcgColor = d3.scaleLinear()
 			.domain([0.88, 1.0]).range(['#f3f1ee', '#AD2111']).clamp(true);
 		const overlapColor = d3.scaleLinear()
-			.domain([0, 1]).range(['#f3f1ee', '#AD2111']).clamp(true);
+			.domain([0, 1]).range(['#f3f1ee', '#7B5EA7']).clamp(true);
 		const fillScale = colorMetric === 'ndcg' ? ndcgColor : overlapColor;
 
 		const overlapStroke = d3.scaleLinear()
@@ -304,8 +304,9 @@
 		const gradId = 'cell-color-grad';
 		const grad = defs.append('linearGradient').attr('id', gradId)
 			.attr('x1', '0%').attr('y1', '100%').attr('x2', '0%').attr('y2', '0%');
+		const gradHi = colorMetric === 'ndcg' ? '#AD2111' : '#7B5EA7';
 		grad.append('stop').attr('offset', '0%').attr('stop-color', '#f3f1ee');
-		grad.append('stop').attr('offset', '100%').attr('stop-color', '#AD2111');
+		grad.append('stop').attr('offset', '100%').attr('stop-color', gradHi);
 
 		root.append('rect')
 			.attr('x', legX).attr('y', legY)
