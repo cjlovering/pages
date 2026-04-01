@@ -31,9 +31,9 @@ const conceptOrder = [
 	'dead', 'captured'
 ];
 
-// Series colors for MCTS vs policy network
+// Series colors for MCTS vs policy network (Find-style blues + red accent)
 const seriesColors = {
-	mcts:   '#282828', // ink
+	mcts:   '#1a3a5c', // dark navy (matches Find bar gradient)
 	policy: '#AD2111'  // accent red
 };
 

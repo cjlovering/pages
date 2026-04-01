@@ -77,7 +77,7 @@
 			// MCTS area
 			const area = d3.area().x(d => x(d.x)).y0(ih).y1(d => y(d.y)).curve(d3.curveMonotoneX);
 			inner.append('path').datum(cd.mcts).attr('d', area)
-				.attr('fill', theme.ink[0]).attr('opacity', 0.06);
+				.attr('fill', theme.seriesColors.mcts).attr('opacity', 0.08);
 
 			// MCTS line
 			inner.append('path').datum(cd.mcts).attr('d', line)

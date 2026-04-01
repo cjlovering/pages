@@ -60,13 +60,16 @@
 			.attr('fill', theme.ink[4])
 			.text('~25% wasted moves');
 
+		const negColors = { dead: '#1a3a5c', captured: '#3d8ec9' };
+
 		for (const [concept, pts] of Object.entries(data)) {
+			const color = negColors[concept] ?? theme.ink[2];
 			const area = d3.area().x(d => x(d.x)).y0(ih).y1(d => y(d.y)).curve(d3.curveMonotoneX);
 			g.append('path').datum(pts).attr('d', area)
-				.attr('fill', theme.conceptColors[concept]).attr('opacity', 0.08);
+				.attr('fill', color).attr('opacity', 0.08);
 			g.append('path').datum(pts).attr('d', line)
 				.attr('fill', 'none')
-				.attr('stroke', theme.conceptColors[concept])
+				.attr('stroke', color)
 				.attr('stroke-width', 2);
 
 			// End label
@@ -74,7 +77,7 @@
 			g.append('text')
 				.attr('x', x(last.x) + 4).attr('y', y(last.y) + 4)
 				.attr('font-family', theme.font.sans).attr('font-size', theme.font.size.annotation)
-				.attr('fill', theme.conceptColors[concept])
+				.attr('fill', color)
 				.text(concept);
 		}
 

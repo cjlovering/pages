@@ -63,22 +63,22 @@
 					.attr('stroke', theme.ink[5]).attr('stroke-width', 1.5);
 			}
 
-			// Behavioral dot (filled)
+			// Behavioral dot (filled, navy — MCTS-driven)
 			if (bx != null) {
 				g.append('circle')
 					.attr('cx', bx).attr('cy', cy)
 					.attr('r', 5.5)
-					.attr('fill', theme.conceptColors[d.concept])
+					.attr('fill', '#1a3a5c')
 					.attr('stroke', theme.surface.page).attr('stroke-width', 1.5);
 			}
 
-			// Probing dot (open)
+			// Probing dot (filled, red — network-driven)
 			if (px != null) {
 				g.append('circle')
 					.attr('cx', px).attr('cy', cy)
 					.attr('r', 5.5)
-					.attr('fill', theme.surface.page)
-					.attr('stroke', theme.conceptColors[d.concept]).attr('stroke-width', 2);
+					.attr('fill', '#AD2111')
+					.attr('stroke', theme.surface.page).attr('stroke-width', 1.5);
 			}
 		});
 
@@ -93,13 +93,13 @@
 		const leg = root.append('g').attr('transform', `translate(${m.left + 4}, ${m.top - 18})`);
 
 		leg.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4)
-			.attr('fill', theme.ink[2]).attr('stroke', theme.surface.page).attr('stroke-width', 1.5);
+			.attr('fill', '#1a3a5c').attr('stroke', theme.surface.page).attr('stroke-width', 1.5);
 		leg.append('text').attr('x', 14).attr('y', 9)
 			.attr('font-family', theme.font.sans).attr('font-size', theme.font.size.legend)
 			.attr('fill', theme.ink[2]).text('Behavioral');
 
 		leg.append('circle').attr('cx', 105).attr('cy', 5).attr('r', 4)
-			.attr('fill', theme.surface.page).attr('stroke', theme.ink[2]).attr('stroke-width', 2);
+			.attr('fill', '#AD2111').attr('stroke', theme.surface.page).attr('stroke-width', 1.5);
 		leg.append('text').attr('x', 114).attr('y', 9)
 			.attr('font-family', theme.font.sans).attr('font-size', theme.font.size.legend)
 			.attr('fill', theme.ink[2]).text('Probing');
