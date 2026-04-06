@@ -1,17 +1,17 @@
 <script>
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'number-of-batches');
 
 	const code = `for batch in range(num_data // batch_size + (num_data % batch_size > 0)):
     ...`;
 </script>
 
-<svelte:head><title>Number of Batches</title></svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Number of Batches</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Get the correct iteration count, including the remainder batch.</p>
-	</header>
 	<section>
 		<CodeBlock lang="python" {code} />
 		<p>First get the number of full batches (<code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">num_data // batch_size</code>), then add 1 if there are remaining data points (<code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">num_data % batch_size > 0</code>).</p>

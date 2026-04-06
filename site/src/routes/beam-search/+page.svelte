@@ -2,18 +2,15 @@
 	import { base } from '$app/paths';
 	import Sidenote from '$lib/components/Sidenote.svelte';
 	import Figure from '$lib/components/Figure.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'beam-search');
 </script>
 
-<svelte:head>
-	<title>Beam Search</title>
-</svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Beam Search</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Exposition of beam search.</p>
-	</header>
-
 	<section>
 		<p class="mb-8">
 			Beam search is a method for decoding a sequence given an auto-regressive function that outputs a probability

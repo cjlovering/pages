@@ -6,8 +6,13 @@
 	import FigureGrid from '$lib/components/FigureGrid.svelte';
 	import FigureGridItem from '$lib/components/FigureGridItem.svelte';
 	import { ScatterPlot } from '$lib/charts/fenway';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import CopyButton from '$lib/components/CopyButton.svelte';
+	import { posts } from '$lib/posts';
 
 	let { data } = $props();
+
+	const post = posts.find(p => p.slug === 'training-priors');
 
 	const tocItems = [
 		{ label: 'Introduction', href: '#introduction' },
@@ -21,29 +26,7 @@
 	];
 </script>
 
-<svelte:head>
-	<title>Training Priors Predict Text-To-Image Model Performance</title>
-</svelte:head>
-
-<!-- Post Heading -->
-<div id="top" class="mx-auto max-w-[660px] text-left">
-	<h1 class="font-serif font-semibold text-[30px] mt-6 leading-snug">
-		Training Priors Predict Text-To-Image Model Performance
-	</h1>
-	<p class="text-[18px] leading-none tracking-wide font-sans mt-6 mb-5">
-		<span class="text-ink-3">Charles Lovering, Ellie Pavlick &mdash;
-			<a href="https://cs.brown.edu"
-				class="text-inherit no-underline hover:underline hover:decoration-ink/20 hover:underline-offset-2"
-			>Brown University</a>
-		</span>
-	</p>
-	<div class="flex flex-wrap gap-2 mb-14">
-		<a href="https://arxiv.org/abs/2306.01755" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			📄 Preprint
-		</a>
-	</div>
-</div>
+<PostHeader {post} />
 
 <!-- Article -->
 <article
@@ -414,13 +397,22 @@
 		<span>Citation<a href="#citation" class="heading-anchor">#</a></span>
 	</h2>
 
-	<pre class="bg-surface-code text-[0.82rem] leading-relaxed rounded px-5 py-4 overflow-x-auto mb-8 border border-border-light"><code>@article&#123;lovering-pavlick-2023-training,
+	<div class="relative group">
+		<CopyButton text={`@article{lovering-pavlick-2023-training,
+  title   = {Training Data Priors Predict Text-To-Image Model Performance},
+  author  = {Lovering, Charles and Pavlick, Ellie},
+  journal = {arXiv preprint arXiv:2306.01755},
+  year    = {2023},
+  url     = {https://arxiv.org/abs/2306.01755}
+}`} />
+		<pre class="bg-surface-code text-[0.82rem] leading-relaxed rounded px-5 py-4 overflow-x-auto mb-8 border border-border-light"><code>@article&#123;lovering-pavlick-2023-training,
   title   = &#123;Training Data Priors Predict Text-To-Image Model Performance&#125;,
   author  = &#123;Lovering, Charles and Pavlick, Ellie&#125;,
   journal = &#123;arXiv preprint arXiv:2306.01755&#125;,
   year    = &#123;2023&#125;,
   url     = &#123;https://arxiv.org/abs/2306.01755&#125;
 &#125;</code></pre>
+	</div>
 
 </article>
 

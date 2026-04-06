@@ -1,14 +1,14 @@
 <script>
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'auto-format-python');
 </script>
 
-<svelte:head><title>Auto-Format Python Code on Save</title></svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Auto-Format Python Code on Save</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Consistently formatted code with no additional effort.</p>
-	</header>
 	<section>
 		<ol class="list-decimal list-inside space-y-2 text-ink-2">
 			<li>Install <code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">black</code> in your Python interpreter: <code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">pip install black</code></li>

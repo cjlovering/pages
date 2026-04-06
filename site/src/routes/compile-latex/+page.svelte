@@ -1,16 +1,16 @@
 <script>
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'compile-latex');
 
 	const code = `latexmk -c main.tex; pdflatex main.tex; bibtex main; pdflatex main.tex;`;
 </script>
 
-<svelte:head><title>Compile a LaTeX File with a Bibliography</title></svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Compile a LaTeX File with a Bibliography</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">The correct sequence of commands to get a PDF with resolved references.</p>
-	</header>
 	<section>
 		<CodeBlock lang="bash" {code} />
 		<ol class="list-decimal list-inside space-y-1 text-ink-2">

@@ -8,12 +8,14 @@
 
 	let { data = {}, height = 240 } = $props();
 
+	const maxW = 420;
+
 	let wrapper = $state();
 	let w = $state(0);
 
 	$effect(() => {
 		if (!wrapper) return;
-		const ro = new ResizeObserver(([e]) => { w = e.contentRect.width; });
+		const ro = new ResizeObserver(([e]) => { w = Math.min(e.contentRect.width, maxW); });
 		ro.observe(wrapper);
 		return () => ro.disconnect();
 	});
@@ -60,9 +62,10 @@
 			.attr('fill', theme.ink[4])
 			.text('~25% wasted moves');
 
-		const negColors = { dead: '#1a3a5c', captured: '#3d8ec9' };
+		const negColors = { dead: theme.conceptColors.dead, captured: theme.conceptColors.captured };
 
-		for (const [concept, pts] of Object.entries(data)) {
+		const entries = Object.entries(data);
+		for (const [concept, pts] of entries) {
 			const color = negColors[concept] ?? theme.ink[2];
 			const area = d3.area().x(d => x(d.x)).y0(ih).y1(d => y(d.y)).curve(d3.curveMonotoneX);
 			g.append('path').datum(pts).attr('d', area)
@@ -71,14 +74,29 @@
 				.attr('fill', 'none')
 				.attr('stroke', color)
 				.attr('stroke-width', 2);
+		}
 
-			// End label
+		// End labels — separate overlapping labels
+		const labels = entries.map(([concept, pts]) => {
 			const last = pts[pts.length - 1];
+			return { concept, x: x(last.x), y: y(last.y), color: negColors[concept] ?? theme.ink[2] };
+		});
+		labels.sort((a, b) => a.y - b.y); // sort by pixel y (top to bottom)
+		const minGap = 14;
+		for (let i = 1; i < labels.length; i++) {
+			const gap = labels[i].y - labels[i - 1].y;
+			if (gap < minGap) {
+				const shift = (minGap - gap) / 2;
+				labels[i - 1].y -= shift;
+				labels[i].y += shift;
+			}
+		}
+		for (const lb of labels) {
 			g.append('text')
-				.attr('x', x(last.x) + 4).attr('y', y(last.y) + 4)
+				.attr('x', lb.x + 4).attr('y', lb.y + 4)
 				.attr('font-family', theme.font.sans).attr('font-size', theme.font.size.annotation)
-				.attr('fill', color)
-				.text(concept);
+				.attr('fill', lb.color)
+				.text(lb.concept);
 		}
 
 		// Axis labels
@@ -96,4 +114,4 @@
 	}
 </script>
 
-<div bind:this={wrapper} class="w-full"></div>
+<div bind:this={wrapper} class="w-full mx-auto" style="max-width: {maxW}px;"></div>

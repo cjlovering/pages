@@ -3,6 +3,11 @@
 	import Toc from '$lib/components/Toc.svelte';
 	import Sidenote from '$lib/components/Sidenote.svelte';
 	import Figure from '$lib/components/Figure.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import CopyButton from '$lib/components/CopyButton.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'predicting-biases');
 
 	const tocItems = [
 		{ label: 'Introduction', href: '#introduction' },
@@ -14,36 +19,7 @@
 	];
 </script>
 
-<svelte:head>
-	<title>Predicting Inductive Biases of Pre-Trained Models</title>
-</svelte:head>
-
-<!-- Post Heading -->
-<div id="top" class="mx-auto max-w-[660px] text-left">
-	<h1 class="font-serif font-semibold text-[30px] mt-6 leading-snug">
-		Predicting Inductive Biases of Pre-Trained Models
-	</h1>
-	<p class="text-[18px] leading-none tracking-wide font-sans mt-6 mb-5">
-		<span class="text-ink-3">Charles Lovering, Rohan Jha, Tal Linzen, Ellie Pavlick &mdash;
-			<a href="https://cs.brown.edu"
-				class="text-inherit no-underline hover:underline hover:decoration-ink/20 hover:underline-offset-2"
-			>Brown</a> &amp;
-			<a href="https://www.nyu.edu"
-				class="text-inherit no-underline hover:underline hover:decoration-ink/20 hover:underline-offset-2"
-			>NYU</a>
-		</span>
-	</p>
-	<div class="flex flex-wrap gap-2 mb-14">
-		<a href="https://openreview.net/forum?id=mNtmhaDkAr" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			📄 Paper
-		</a>
-		<a href="https://github.com/cjlovering/predicting-inductive-biases" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			💻 Code
-		</a>
-	</div>
-</div>
+<PostHeader {post} />
 
 <!-- Article -->
 <article
@@ -285,13 +261,22 @@
 		<span>Citation<a href="#citation" class="heading-anchor">#</a></span>
 	</h2>
 
-	<pre class="bg-surface-code text-[0.82rem] leading-relaxed rounded px-5 py-4 overflow-x-auto mb-8 border border-border-light"><code>@inproceedings&#123;lovering2021predictinginductive,
+	<div class="relative group">
+		<CopyButton text={`@inproceedings{lovering2021predictinginductive,
+  title     = {Predicting Inductive Biases of Fine-tuned Models},
+  author    = {Lovering, Charles and Jha, Rohan and Linzen, Tal and Pavlick, Ellie},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2021},
+  url       = {https://openreview.net/forum?id=mNtmhaDkAr}
+}`} />
+		<pre class="bg-surface-code text-[0.82rem] leading-relaxed rounded px-5 py-4 overflow-x-auto mb-8 border border-border-light"><code>@inproceedings&#123;lovering2021predictinginductive,
   title     = &#123;Predicting Inductive Biases of Fine-tuned Models&#125;,
   author    = &#123;Lovering, Charles and Jha, Rohan and Linzen, Tal and Pavlick, Ellie&#125;,
   booktitle = &#123;International Conference on Learning Representations&#125;,
   year      = &#123;2021&#125;,
   url       = &#123;https://openreview.net/forum?id=mNtmhaDkAr&#125;
 &#125;</code></pre>
+	</div>
 
 </article>
 

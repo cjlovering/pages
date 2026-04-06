@@ -1,44 +1,268 @@
 [
   {
-    "concept": "bridge",
-    "behavioral": 14,
-    "probing": 18
-  },
-  {
-    "concept": "crescent",
-    "behavioral": 14,
-    "probing": 16
-  },
-  {
-    "concept": "trapezoid",
-    "behavioral": 15,
-    "probing": 15
-  },
-  {
-    "concept": "span",
-    "behavioral": 16,
-    "probing": 16
-  },
-  {
-    "concept": "edge",
-    "behavioral": 16
+    "concept": "bottleneck",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 17.0,
+    "sd": 0.0
   },
   {
     "concept": "bottleneck",
-    "behavioral": 16,
-    "probing": 14
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 11.6,
+    "sd": 5.94
   },
   {
-    "concept": "escape",
-    "behavioral": 16,
-    "probing": 16
+    "concept": "bottleneck",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 7.5,
+    "sd": 6.85
   },
   {
-    "concept": "dead",
-    "probing": 17
+    "concept": "bottleneck",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 7.0,
+    "sd": 7.38
+  },
+  {
+    "concept": "bridge",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 16.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "bridge",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 9.6,
+    "sd": 4.83
+  },
+  {
+    "concept": "bridge",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 17.6,
+    "sd": 1.51
+  },
+  {
+    "concept": "bridge",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 12.5,
+    "sd": 0.53
   },
   {
     "concept": "captured",
-    "probing": 18
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 17.8,
+    "sd": 1.92
+  },
+  {
+    "concept": "captured",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 11.2,
+    "sd": 5.17
+  },
+  {
+    "concept": "captured",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 15.6,
+    "sd": 2.51
+  },
+  {
+    "concept": "captured",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 13.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "crescent",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 16.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "crescent",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 8.8,
+    "sd": 4.38
+  },
+  {
+    "concept": "crescent",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 17.3,
+    "sd": 0.95
+  },
+  {
+    "concept": "crescent",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 12.5,
+    "sd": 0.53
+  },
+  {
+    "concept": "dead",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 18.8,
+    "sd": 1.1
+  },
+  {
+    "concept": "dead",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 5.2,
+    "sd": 2.77
+  },
+  {
+    "concept": "dead",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 15.6,
+    "sd": 1.34
+  },
+  {
+    "concept": "dead",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 13.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "edge",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 17.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "edge",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 13.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "edge",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 17.2,
+    "sd": 0.84
+  },
+  {
+    "concept": "edge",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 12.8,
+    "sd": 0.84
+  },
+  {
+    "concept": "escape",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 18.8,
+    "sd": 1.1
+  },
+  {
+    "concept": "escape",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 14.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "escape",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 1.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "escape",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 0.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "span",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 19.8,
+    "sd": 0.45
+  },
+  {
+    "concept": "span",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 10.0,
+    "sd": 0.0
+  },
+  {
+    "concept": "span",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 17.1,
+    "sd": 1.85
+  },
+  {
+    "concept": "span",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 12.5,
+    "sd": 0.53
+  },
+  {
+    "concept": "structural",
+    "tool": "structural",
+    "metric": "converged",
+    "mean": 17.33,
+    "sd": 1.73
+  },
+  {
+    "concept": "structural",
+    "tool": "structural",
+    "metric": "start",
+    "mean": 11.36,
+    "sd": 2.39
+  },
+  {
+    "concept": "trapezoid",
+    "tool": "behavioral",
+    "metric": "converged",
+    "mean": 16.8,
+    "sd": 1.3
+  },
+  {
+    "concept": "trapezoid",
+    "tool": "behavioral",
+    "metric": "start",
+    "mean": 6.8,
+    "sd": 3.49
+  },
+  {
+    "concept": "trapezoid",
+    "tool": "probing",
+    "metric": "converged",
+    "mean": 17.6,
+    "sd": 1.58
+  },
+  {
+    "concept": "trapezoid",
+    "tool": "probing",
+    "metric": "start",
+    "mean": 12.5,
+    "sd": 0.53
   }
 ]

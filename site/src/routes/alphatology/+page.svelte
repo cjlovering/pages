@@ -2,14 +2,21 @@
 	import Toc from '$lib/components/Toc.svelte';
 	import Sidenote from '$lib/components/Sidenote.svelte';
 	import Figure from '$lib/components/Figure.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import CopyButton from '$lib/components/CopyButton.svelte';
+	import { posts } from '$lib/posts';
 	import {
 		ProbingChart,
+		SelectivityChart,
+		LayerwiseChart,
 		LearningCurves,
 		NegativeCurves,
 		ConvergenceChart,
 		BoardAnimation,
 		HexBoard
 	} from '$lib/charts/alphatology';
+
+	const post = posts.find(p => p.slug === 'alphatology');
 
 	const tocItems = [
 		{ label: 'Introduction', href: '#introduction' },
@@ -24,6 +31,8 @@
 
 	// ── Chart data (loaded as static JSON) ──
 	let probingData = $state(null);
+	let selectivityData = $state(null);
+	let layerwiseData = $state(null);
 	let positiveCurves = $state(null);
 	let negativeCurves = $state(null);
 	let convergenceData = $state(null);
@@ -37,6 +46,8 @@
 
 	$effect(() => {
 		loadJson('/alphatology/data-probing.json').then(d => probingData = d);
+		loadJson('/alphatology/data-selectivity.json').then(d => selectivityData = d);
+		loadJson('/alphatology/data-layerwise.json').then(d => layerwiseData = d);
 		loadJson('/alphatology/data-positive-curves.json').then(d => positiveCurves = d);
 		loadJson('/alphatology/data-negative-curves.json').then(d => negativeCurves = d);
 		loadJson('/alphatology/data-convergence.json').then(d => convergenceData = d);
@@ -54,33 +65,7 @@
 	const positiveConcepts = ['bridge', 'crescent', 'trapezoid', 'span', 'edge', 'bottleneck', 'escape'];
 </script>
 
-<svelte:head>
-	<title>Evaluation Beyond Task Performance</title>
-</svelte:head>
-
-<!-- Post Heading -->
-<div id="top" class="mx-auto max-w-[660px] text-left">
-	<h1 class="font-serif font-semibold text-[30px] mt-6 leading-snug">
-		Evaluation Beyond Task Performance: Analyzing Concepts in AlphaZero in Hex
-	</h1>
-	<p class="text-[18px] leading-none tracking-wide font-sans mt-6 mb-5">
-		<span class="text-ink-3">Charles Lovering*, Jessica Zosa Forde*, George Konidaris, Ellie Pavlick, Michael L. Littman &mdash;
-			<a href="https://cs.brown.edu"
-				class="text-inherit no-underline hover:underline hover:decoration-ink/20 hover:underline-offset-2"
-			>Brown</a>
-		</span>
-	</p>
-	<div class="flex flex-wrap gap-2 mb-14">
-		<a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/79bf4400e1e4e6b209650e3c06e5e9e6-Abstract-Conference.html" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			Paper
-		</a>
-		<a href="https://github.com/jzf2101/alphatology" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			Code
-		</a>
-	</div>
-</div>
+<PostHeader {post} />
 
 <!-- Article -->
 <article
@@ -127,6 +112,10 @@
 		<span>Concepts in Hex<a href="#concepts" class="heading-anchor">#</a></span>
 	</h2>
 
+	<Figure src="/alphatology/fig1a-win-for-black.png" alt="A completed Hex board showing a win for black" maxWidth="240px">
+		A winning board for black, connecting the black edges.
+	</Figure>
+
 	<p class="mb-5 text-[17px] leading-relaxed">
 		Hex is a board game where two players take turns filling cells until one
 		builds a connecting chain across the board. Unlike Go, there are no captures.
@@ -138,9 +127,8 @@
 		<a href="https://webdocs.cs.ualberta.ca/~hayward/hex/" class="underline decoration-ink-4/30">MoHex</a>.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig1-hex-intro.png" alt="Hex board basics: a winning board for black and short- vs long-term concept examples" maxWidth="580px">
-		<em>(a)</em> A winning board for black, connecting the black edges.
-		<em>(b)</em> Short- vs long-term concepts. If black plays A or B in the center
+	<Figure src="/alphatology/fig1b-concept-examples.png" alt="Short-term vs long-term concept examples on Hex boards" maxWidth="435px">
+		Short- vs long-term concepts. If black plays A or B in the left
 		board, black immediately wins (short-term). In the right board, A and B can
 		help black win only in the long-term.
 	</Figure>
@@ -148,7 +136,7 @@
 	<p class="mb-5 text-[17px] leading-relaxed">
 		We define a concept to be <strong>short-term</strong> if its use is sufficient
 		to win the game (typically when connected to the player's board edges), and
-		<strong>long-term</strong> otherwise. From Seymour and King, we identify nine
+		<strong>long-term</strong> otherwise. From <a href="https://www.hexwiki.net/index.php/Strategy" class="underline decoration-ink-4/30">Seymour and King</a>, we identify nine
 		concepts in four categories:
 	</p>
 
@@ -227,14 +215,37 @@
 		higher layers than long-term concepts.</Sidenote>
 	</p>
 
-	{#if probingData}
+	{#if selectivityData}
 		<figure class="my-8 [counter-increment:figure-counter]">
-			<ProbingChart data={probingData} height={320} />
-			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
-				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
-				Probing selectivity (bars, left axis) and best network layer (dots, right axis)
-				for each concept at the final training checkpoint. Long-term concepts peak in
-				middle layers (4–8); short-term concepts peak in the final layers (8–9).
+			<SelectivityChart data={selectivityData} height={300} />
+			<figcaption class="
+				block w-full mt-2 mb-0
+				text-[0.9rem] leading-snug
+				font-serif text-left text-ink-3
+				before:content-['Figure_'_counter(figure-counter)_':_']
+				before:font-semibold
+			">
+				AlphaZero successfully encodes long-term and short-term concepts. The colored
+				bars show the accuracy of a probe trained to identify a concept from network
+				activations; grey bars show the selectivity baseline (boards with randomly
+				remapped pieces). We report selectivity from the layer with highest test accuracy.
+			</figcaption>
+		</figure>
+	{/if}
+
+	{#if layerwiseData}
+		<figure class="my-8 [counter-increment:figure-counter]">
+			<LayerwiseChart data={layerwiseData} height={260} />
+			<figcaption class="
+				block w-full mt-2 mb-0
+				text-[0.9rem] leading-snug
+				font-serif text-left text-ink-3
+				before:content-['Figure_'_counter(figure-counter)_':_']
+				before:font-semibold
+			">
+				Long-term concepts are best represented in the middle layers of the network
+				whereas short-term concepts are best represented in the final layers. Each
+				distribution shows the layer in which probes had the highest accuracies.
 			</figcaption>
 		</figure>
 	{/if}
@@ -256,11 +267,17 @@
 	{#if positiveCurves}
 		<figure class="my-8 [counter-increment:figure-counter]">
 			<LearningCurves data={positiveCurves} concepts={positiveConcepts} height={440} />
-			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
-				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+			<figcaption class="
+				block w-full mt-2 mb-0
+				text-[0.9rem] leading-snug
+				font-serif text-left text-ink-3
+				before:content-['Figure_'_counter(figure-counter)_':_']
+				before:font-semibold
+			">
 				Learning curves for positive concepts. At each training checkpoint, we test
-				whether AZ plays the concept-expected move (Z &gt; 1). Solid: MCTS; dashed:
-				policy network. Both rise sharply around checkpoint 10–14.
+				whether AZ plays the concept-expected move. Blue: MCTS action has Z &gt; 1;
+				yellow: MCTS selects the correct action; pink (dashed): policy network selects
+				the correct action. All rise sharply around checkpoint 10–14.
 			</figcaption>
 		</figure>
 	{/if}
@@ -280,8 +297,13 @@
 	{#if negativeCurves}
 		<figure class="my-8 [counter-increment:figure-counter]">
 			<NegativeCurves data={negativeCurves} height={240} />
-			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
-				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+			<figcaption class="
+				block w-full mt-2 mb-0
+				text-[0.9rem] leading-snug
+				font-serif text-left text-ink-3
+				before:content-['Figure_'_counter(figure-counter)_':_']
+				before:font-semibold
+			">
 				Negative concept pass rates. <em>Passed</em> = AZ avoids dead/captured cells
 				throughout selfplay. Even fully trained, ~25% of moves are wasted.
 			</figcaption>
@@ -308,12 +330,19 @@
 
 	{#if convergenceData}
 		<figure class="my-8 [counter-increment:figure-counter]">
-			<ConvergenceChart data={convergenceData} height={300} />
-			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
-				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
-				Behavioral convergence (filled dots) vs. probing convergence (open dots).
-				For most concepts, behavioral tests improve before probing accuracy,
+			<ConvergenceChart data={convergenceData} height={320} />
+			<figcaption class="
+				block w-full mt-2 mb-0
+				text-[0.9rem] leading-snug
+				font-serif text-left text-ink-3
+				before:content-['Figure_'_counter(figure-counter)_':_']
+				before:font-semibold
+			">
+				Improvements in behavioral tests occur before improvements in probing accuracy.
+				Circles mark when each metric first improves; crosses mark convergence.
+				For most concepts, behavioral tests (blue) improve before probing accuracy (pink),
 				confirming that MCTS discovers concepts before the network internalizes them.
+				Board structure (gold) converges on a similar timeline to probing.
 			</figcaption>
 		</figure>
 	{/if}
@@ -336,28 +365,16 @@
 		then learn concepts" narrative.</Sidenote>
 	</p>
 
-	{#if structureData}
-		<figure class="my-8 [counter-increment:figure-counter]">
-			<BoardAnimation
-				frames={boardFrames}
-				{structureData}
-				imgSize={400}
-			/>
-			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
-				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
-				Implicit board structure emerging during training (original). Each grey
-				circle is a Hex cell; arrows show learned nearest neighbors from
-				first-layer embeddings. At checkpoint 0, arrows are random; by
-				checkpoint 20, the hexagonal grid is recovered.
-			</figcaption>
-		</figure>
-	{/if}
-
 	{#if boardCellData}
 		<figure class="my-8 [counter-increment:figure-counter]">
 			<HexBoard cellData={boardCellData} size={420} />
-			<figcaption class="mt-3 text-[14px] text-ink-3 leading-snug max-w-prose">
-				<span class="font-semibold">Figure <span class="[content:counter(figure-counter)]"></span>.</span>
+			<figcaption class="
+				block w-full mt-2 mb-0
+				text-[0.9rem] leading-snug
+				font-serif text-left text-ink-3
+				before:content-['Figure_'_counter(figure-counter)_':_']
+				before:font-semibold
+			">
 				Reconstructed board structure from per-cell overlap scores (D3). Arrows
 				to true hex neighbors fade in as overlap increases; noise arrows to
 				random cells fade out. Cells color from grey to red with overlap.
@@ -378,7 +395,21 @@
 		>Evaluation Beyond Task Performance: Analyzing Concepts in AlphaZero in Hex</a>.
 	</p>
 
-	<pre class="bg-surface-code rounded text-[13px] leading-snug p-4 overflow-x-auto font-mono text-ink-3"><code>@inproceedings&#123;lovering2022evaluation,
+	<div class="relative group">
+		<CopyButton text={`@inproceedings{lovering2022evaluation,
+    title     = "Evaluation Beyond Task Performance:
+                 Analyzing Concepts in {A}lpha{Z}ero
+                 in {H}ex",
+    author    = "Lovering, Charles and
+                 Forde, Jessica Zosa and
+                 Konidaris, George and
+                 Pavlick, Ellie and
+                 Littman, Michael L.",
+    booktitle = "Advances in Neural Information
+                 Processing Systems",
+    year      = "2022",
+}`} />
+		<pre class="bg-surface-code rounded text-[13px] leading-snug p-4 overflow-x-auto font-mono text-ink-3"><code>@inproceedings&#123;lovering2022evaluation,
     title     = "Evaluation Beyond Task Performance:
                  Analyzing Concepts in &#123;A&#125;lpha&#123;Z&#125;ero
                  in &#123;H&#125;ex",
@@ -391,6 +422,7 @@
                  Processing Systems",
     year      = "2022",
 &#125;</code></pre>
+	</div>
 
 </article>
 

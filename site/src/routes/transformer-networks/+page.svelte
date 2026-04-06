@@ -3,6 +3,11 @@
 	import Sidenote from '$lib/components/Sidenote.svelte';
 	import Figure from '$lib/components/Figure.svelte';
 	import Toc from '$lib/components/Toc.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import CopyPre from '$lib/components/CopyPre.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'transformer-networks');
 
 	const tocItems = [
 		{ label: 'Introduction', href: '#introduction' },
@@ -26,20 +31,13 @@
 </script>
 
 <svelte:head>
-	<title>Transformer Networks</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 </svelte:head>
 
+<PostHeader {post} />
+
 <article class="relative max-w-prose mx-auto">
 	<Toc items={tocItems} />
-
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Transformer Networks</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Attention is all you need.</p>
-		<p class="text-ink-4 text-[0.85rem] font-sans mt-2">
-			Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, Polosukhin
-		</p>
-	</header>
 
 	<section>
 		<p class="bg-surface rounded px-4 py-3 text-[0.9rem] mb-6">
@@ -57,7 +55,7 @@
 		<h2 id="introduction" class="text-2xl font-serif font-normal mt-10 mb-4">Introduction</h2>
 
 		<p>
-			Attention is all you need<Sidenote id="sn-vaswani">Vaswani, A. et al. (2017). Attention is All You Need. <em>NeurIPS</em>.</Sidenote>
+			Attention is all you need<Sidenote id="sn-vaswani"><a href="https://arxiv.org/abs/1706.03762" class="underline decoration-ink-4/30">Vaswani, A. et al. (2017). Attention is All You Need.</a> <em>NeurIPS</em>.</Sidenote>
 			introduces the Transformer Network. This network is a shift from recurrent networks; economy inspires design.
 			It does not use stateful or recurrent functions, and instead it is parallelized across all symbols in an input
 			sequence. However, it is difficult at first to see how this works with sequences of different length. The
@@ -71,7 +69,7 @@
 			This notebook focuses on the unique modules the authors present, and how the system fits together. The Transformer
 			Network (TN) is composed of attention modules, linear mappings, regularization features and uses an Encoder-Decoder
 			structure. Since this publication, Transformer Networks Encoders have been used to great success in a wide range of
-			applications<Sidenote id="sn-bert">Devlin, J. et al. (2018). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.</Sidenote>.
+			applications<Sidenote id="sn-bert"><a href="https://arxiv.org/abs/1810.04805" class="underline decoration-ink-4/30">Devlin, J. et al. (2018). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.</a></Sidenote>.
 		</p>
 
 		<p>
@@ -86,7 +84,7 @@
 		<h2 id="encoder-decoder" class="text-2xl font-serif font-normal mt-10 mb-4">Encoder-Decoder Structure</h2>
 
 		<p>
-			The transformer uses an encoder-decoder<Sidenote id="sn-bahdanau">Bahdanau, D. et al. (2014). Neural Machine Translation by Jointly Learning to Align and Translate.</Sidenote>
+			The transformer uses an encoder-decoder<Sidenote id="sn-bahdanau"><a href="https://arxiv.org/abs/1409.0473" class="underline decoration-ink-4/30">Bahdanau, D. et al. (2014). Neural Machine Translation by Jointly Learning to Align and Translate.</a></Sidenote>
 			structure: an input sequence of symbols, <em>x = {"{"} x<sub>1</sub>, x<sub>2</sub>, ..., x<sub>n</sub> {"}"}</em>,
 			is encoded into a sequence of continuous variables, <strong>z</strong> = {"{"} z<sub>1</sub>, z<sub>2</sub>, ..., z<sub>n</sub> {"}"}.
 			This is then decoded into a sequence of symbols, <em>y = {"{"} y<sub>1</sub>, y<sub>2</sub>, ..., y<sub>n</sub> {"}"}</em>.
@@ -205,7 +203,7 @@
 
 		<p>Below is an implementation for scaled dot product attention. Each line corresponds to a box in the figure above.</p>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def attention(query, key, value, mask=None):
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def attention(query, key, value, mask=None):
     "Compute 'Scaled Dot Product Attention'"
     # Compatibility function (dot product) between the query and keys.
     scores = torch.matmul(query, key.transpose(-2, -1))
@@ -217,7 +215,7 @@
     # Compute probability distribution across the final dimension.
     p_attn = F.softmax(scores, dim = -1)
     # Output linear combinations of values.
-    return torch.matmul(p_attn, value), p_attn</code></pre>
+    return torch.matmul(p_attn, value), p_attn</code></pre></CopyPre>
 
 		<h3 id="self-attention" class="text-xl font-serif font-normal mt-10 mb-4">Self Attention</h3>
 
@@ -226,7 +224,7 @@
 			linear combination of the values, and it can only reproduce itself so it serves as an identity function.
 		</p>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def SelfAttention(X):
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def SelfAttention(X):
     Q, K, V = X, X, X
     return attention(Q, K, V)
 
@@ -234,14 +232,14 @@
 &gt;&gt;&gt; print(out)
 tensor([[0.1000, 0.1000, 0.8000]])
 &gt;&gt;&gt; print(alpha)
-tensor([[1.]])</code></pre>
+tensor([[1.]])</code></pre></CopyPre>
 
 		<p>
 			When there are multiple queries, the vectors that are most <em>compatible</em> will become more similar because
 			they are mapped to combinations consisting mostly of the already-compatible vectors.
 		</p>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">&gt;&gt;&gt; X = torch.FloatTensor(
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">&gt;&gt;&gt; X = torch.FloatTensor(
     [
         [0,0,1],
         [0,0,2],
@@ -256,7 +254,7 @@ tensor(
         [0.2228, 0.7070, 0.0702],
         [0.2645, 0.2645, 0.4711]
     ]
-)</code></pre>
+)</code></pre></CopyPre>
 
 		<p>
 			Note that, especially with values greater than 1, a vector can have a greater dot product with other vectors
@@ -290,7 +288,7 @@ tensor(
 			performance of this method? How well would the transformer perform using a feed forward layer?
 		</blockquote>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">class MultiHeadedAttention(nn.Module):
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">class MultiHeadedAttention(nn.Module):
     def __init__(self, h, d_model, dropout=0.1):
         """Take in model size and number of heads."""
         super(MultiHeadedAttention, self).__init__()
@@ -318,7 +316,7 @@ tensor(
         # 3) "Concat" using a view and apply a final linear
         x = x.transpose(1, 2).contiguous() \
             .view(nbatches, -1, self.h * self.d_k)
-        return self.linears[-1](x)</code></pre>
+        return self.linears[-1](x)</code></pre></CopyPre>
 
 		<p>
 			Thus, the multi-headed attention is a function from &real;<sup>q&times;d</sup> &rarr; &real;<sup>q&times;v</sup>.
@@ -343,7 +341,7 @@ tensor(
 			<p class="font-mono text-[0.9rem]">FFN(x) = max(0, xW<sub>1</sub> + b<sub>1</sub>)W<sub>2</sub> + b<sub>2</sub></p>
 		</div>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">class PositionwiseFeedForward(nn.Module):
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">class PositionwiseFeedForward(nn.Module):
     """Implements FFN equation."""
     def __init__(self, d_model=512, d_ff=2048, dropout=0.1):
         super(PositionwiseFeedForward, self).__init__()
@@ -352,7 +350,7 @@ tensor(
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        return self.w_2(self.dropout(F.relu(self.w_1(x))))</code></pre>
+        return self.w_2(self.dropout(F.relu(self.w_1(x))))</code></pre></CopyPre>
 
 		<p>
 			The remaining features used by the network are residual layers, layer normalization, and positional encoding.
@@ -473,7 +471,7 @@ tensor(
 
 		<p>A greedy approach looks something like this:</p>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def greedy_decode(model, src, src_mask, max_len, start_symbol):
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def greedy_decode(model, src, src_mask, max_len, start_symbol):
     memory = model.encode(src, src_mask)
     ys = torch.ones(1, 1).fill_(start_symbol).type_as(src.data)
     for i in range(max_len-1):
@@ -487,7 +485,7 @@ tensor(
         next_word = next_word.data[0]
         ys = torch.cat([ys,
             torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=1)
-    return ys</code></pre>
+    return ys</code></pre></CopyPre>
 
 		<p>
 			Using

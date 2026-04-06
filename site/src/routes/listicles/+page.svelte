@@ -1,18 +1,14 @@
 <script>
 	import Sidenote from '$lib/components/Sidenote.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'listicles');
 </script>
 
-<svelte:head>
-	<title>Listicles</title>
-</svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Listicles</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">A natural dataset without the biases of human-elicited datasets.</p>
-		<p class="text-ink-4 text-[0.85rem] font-sans mt-2">Charles Lovering, Ellie Pavlick &mdash; Brown University</p>
-	</header>
-
 	<section>
 		<p>
 			This is a dataset of ~341k items consisting of claims and reasons, collected from listicle-style web pages

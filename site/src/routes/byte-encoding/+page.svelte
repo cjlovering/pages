@@ -1,17 +1,15 @@
 <script>
 	import Sidenote from '$lib/components/Sidenote.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import CopyPre from '$lib/components/CopyPre.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'byte-encoding');
 </script>
 
-<svelte:head>
-	<title>Byte-Encoding Representation</title>
-</svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Byte-Encoding Representation</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Neural machine translation of rare words with subword units</p>
-		<p class="text-ink-4 text-[0.85rem] font-sans mt-2">Rico Sennrich, Barry Haddow, Alexandra Birch</p>
-	</header>
 
 	<section>
 		<p>
@@ -20,9 +18,9 @@
 			is as follows:
 		</p>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code>V = {"{"}  "low", "lowest", "newer", "wider" {"}"}
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code>V = {"{"}  "low", "lowest", "newer", "wider" {"}"}
 BCE("lower")
-&gt; "low", "er"</code></pre>
+&gt; "low", "er"</code></pre></CopyPre>
 
 		<p>
 			This is much more valuable than a symbol for an unknown word (UNK). Using the two subword segments,
@@ -37,7 +35,7 @@ BCE("lower")
 			steps be common strings.
 		</p>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">import re
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">import re
 import collections
 
 def get_stats(vocab):
@@ -62,11 +60,11 @@ def merge_vocab(pair, v_in):
     for word in v_in:
         w_out = p.sub(''.join(pair), word)
         v_out[w_out] = v_in[word]
-    return v_out</code></pre>
+    return v_out</code></pre></CopyPre>
 
 		<p>Next, given the bi-counts of a vocabulary, merge the vocabulary to remove repetitions of this bigram.</p>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def byte_pair_encoding(vocab, num_merges=5):
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code class="language-python">def byte_pair_encoding(vocab, num_merges=5):
     """For the given number of merges,
     find the most common pairs of symbols.
     """
@@ -77,9 +75,9 @@ def merge_vocab(pair, v_in):
             print('no pair has frequency &gt; 1. Stopping\n')
             break
         vocab = merge_vocab(best, vocab)
-    print(vocab)</code></pre>
+    print(vocab)</code></pre></CopyPre>
 
-		<pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code>&gt;&gt;&gt; vocab = {"{}"}
+		<CopyPre><pre class="bg-surface-code rounded px-4 py-3 text-[0.85rem] font-mono leading-relaxed overflow-x-auto mb-6"><code>&gt;&gt;&gt; vocab = {"{}"}
     'l o w &lt;/w&gt;' : 5,
     'f a r t h e s t &lt;/w&gt;' : 5,
     'n e w e r &lt;/w&gt;': 5,
@@ -90,6 +88,6 @@ def merge_vocab(pair, v_in):
 {"{"}  'l o w &lt;/w&gt;': 5, 'f a r t h e s t &lt;/w&gt;': 5, 'n e w er&lt;/w&gt;': 5, 'w i d er&lt;/w&gt;': 5  {"}"}
 {"{"}  'lo w &lt;/w&gt;': 5, 'f a r t h e s t &lt;/w&gt;': 5, 'n e w er&lt;/w&gt;': 5, 'w i d er&lt;/w&gt;': 5  {"}"}
 {"{"}  'low &lt;/w&gt;': 5, 'f a r t h e s t &lt;/w&gt;': 5, 'n e w er&lt;/w&gt;': 5, 'w i d er&lt;/w&gt;': 5  {"}"}
-{"{"}  'low&lt;/w&gt;': 5, 'f a r t h e s t &lt;/w&gt;': 5, 'n e w er&lt;/w&gt;': 5, 'w i d er&lt;/w&gt;': 5  {"}"}</code></pre>
+{"{"}  'low&lt;/w&gt;': 5, 'f a r t h e s t &lt;/w&gt;': 5, 'n e w er&lt;/w&gt;': 5, 'w i d er&lt;/w&gt;': 5  {"}"}</code></pre></CopyPre>
 	</section>
 </article>

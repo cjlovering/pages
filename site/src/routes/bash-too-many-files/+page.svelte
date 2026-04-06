@@ -1,14 +1,14 @@
 <script>
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'bash-too-many-files');
 </script>
 
-<svelte:head><title>Fix "Too Many Files" for Bash</title></svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Fix "Too Many Files" for Bash</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">When <code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">cp</code>, <code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">mv</code>, or <code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">rename</code> fails because there are too many files, use <code class="text-[0.85rem] bg-surface-code px-1.5 py-0.5 rounded">find</code> instead.</p>
-	</header>
 	<section>
 		<CodeBlock lang="bash" code={`find DIR_PATH -name "*.ext" -exec COMMAND {} \\;`} />
 		<p>For example:</p>

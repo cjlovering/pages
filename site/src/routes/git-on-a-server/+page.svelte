@@ -1,14 +1,14 @@
 <script>
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'git-on-a-server');
 </script>
 
-<svelte:head><title>Git on a Server</title></svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Git on a Server</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Fixes for common git annoyances on remote machines.</p>
-	</header>
 	<section>
 		<h2 class="text-2xl font-serif font-normal mt-10 mb-4">git diff</h2>
 		<p>If you don't see color or see a lot of ESC characters in diffs:</p>

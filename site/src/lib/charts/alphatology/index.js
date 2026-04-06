@@ -1,4 +1,6 @@
 export { default as ProbingChart } from './ProbingChart.svelte';
+export { default as SelectivityChart } from './SelectivityChart.svelte';
+export { default as LayerwiseChart } from './LayerwiseChart.svelte';
 export { default as LearningCurves } from './LearningCurves.svelte';
 export { default as NegativeCurves } from './NegativeCurves.svelte';
 export { default as ConvergenceChart } from './ConvergenceChart.svelte';

@@ -1,14 +1,14 @@
 <script>
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'readable-file-sizes');
 </script>
 
-<svelte:head><title>Readable File/Folder Sizes</title></svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Readable File/Folder Sizes</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Human-readable sizes for files in the current directory.</p>
-	</header>
 	<section>
 		<CodeBlock lang="bash" code={`du -h`} />
 		<p class="text-ink-4 text-[0.8rem]">

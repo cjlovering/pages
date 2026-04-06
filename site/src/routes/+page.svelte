@@ -1099,7 +1099,7 @@
 			</div>
 		</div>
 	</div>
-	<p class="text-ink-3 text-[0.92rem] leading-relaxed mt-5">I work on understanding neural models (language models, vision models, game-playing models) &mdash; their internals (more so during my PhD; i.e., interpretability) and their behavior (more so in my professional role; i.e., evaluation). I completed my PhD at Brown University in 2023 and thereafter have worked as a research scientist at Kensho Technologies.</p>
+	<p class="text-ink-3 text-[0.92rem] leading-relaxed mt-5">I work on understanding neural models (language models, vision models, game-playing models), both their internals (more so during my PhD; i.e., interpretability) and their behavior (more so in my professional role; i.e., evaluation). I completed my PhD at Brown University in 2023 and thereafter have worked as a research scientist at Kensho Technologies.</p>
 	<div class="h-px bg-border mt-6"></div>
 </section>
 

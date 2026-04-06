@@ -1,5 +1,9 @@
 <script>
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'haiku-merge-params');
 
 	const code = `import haiku as hk
 
@@ -20,13 +24,9 @@ def merge_pretrained_params(new_params: hk.Params, pre_params: hk.Params) -> hk.
     return hk.data_structures.merge(new_params, used_pre_params)`;
 </script>
 
-<svelte:head><title>Haiku Merge Params</title></svelte:head>
+<PostHeader {post} />
 
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Haiku Merge Params</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Merge pre-trained parameters into a new Haiku model, keeping only the keys the new model expects.</p>
-	</header>
 	<section>
 		<CodeBlock lang="python" {code} />
 		<p class="text-ink-4 text-[0.8rem]">

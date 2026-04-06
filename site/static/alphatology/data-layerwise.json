@@ -1,0 +1,110 @@
+[
+  {
+    "condition": "Short-term",
+    "layer": 1,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Short-term",
+    "layer": 2,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Short-term",
+    "layer": 3,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Short-term",
+    "layer": 4,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Short-term",
+    "layer": 5,
+    "count": 2,
+    "percent": 5.71
+  },
+  {
+    "condition": "Short-term",
+    "layer": 6,
+    "count": 9,
+    "percent": 25.71
+  },
+  {
+    "condition": "Short-term",
+    "layer": 7,
+    "count": 10,
+    "percent": 28.57
+  },
+  {
+    "condition": "Short-term",
+    "layer": 8,
+    "count": 14,
+    "percent": 40.0
+  },
+  {
+    "condition": "Short-term",
+    "layer": 9,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 1,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 2,
+    "count": 2,
+    "percent": 5.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 3,
+    "count": 1,
+    "percent": 2.5
+  },
+  {
+    "condition": "Long-term",
+    "layer": 4,
+    "count": 8,
+    "percent": 20.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 5,
+    "count": 18,
+    "percent": 45.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 6,
+    "count": 10,
+    "percent": 25.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 7,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 8,
+    "count": 0,
+    "percent": 0.0
+  },
+  {
+    "condition": "Long-term",
+    "layer": 9,
+    "count": 1,
+    "percent": 2.5
+  }
+]

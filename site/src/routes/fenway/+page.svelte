@@ -5,11 +5,16 @@
 	import FigureGrid from '$lib/components/FigureGrid.svelte';
 	import FigureGridItem from '$lib/components/FigureGridItem.svelte';
 	import { BarPlot, ScatterPlot, theme } from '$lib/charts/fenway';
+	import CopyButton from '$lib/components/CopyButton.svelte';
 	import CalibrationLegend from '$lib/charts/fenway/CalibrationLegend.svelte';
 	import BehaviorHeatmap from '$lib/charts/fenway/BehaviorHeatmap.svelte';
 	import SetupFigure from '$lib/charts/fenway/SetupFigure.svelte';
 	import PaperHeatmap from '$lib/charts/fenway/PaperHeatmap.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
 	import { SvelteSet } from 'svelte/reactivity';
+
+	const post = posts.find(p => p.slug === 'fenway');
 
 	// Figure 2 data: 11×11 dominant behavior rate matrix from the paper (GPT-4o Mini)
 	// Values = rate of dominant behavior (pick-first above anti-diagonal, pick-higher below)
@@ -63,25 +68,7 @@
 	];
 </script>
 
-<!-- Post Heading -->
-<div id="top" class="mx-auto max-w-[660px] text-left">
-	<h1 class="font-serif font-semibold text-[30px] mt-6 leading-snug">
-		Language Models Struggle With Numeric Calibration
-	</h1>
-	<p class="text-[18px] leading-none tracking-wide font-sans mt-6 mb-5">
-		<span class="text-ink-3">Research @
-			<a href="https://kensho.com/research"
-				class="text-inherit no-underline hover:underline hover:decoration-ink/20 hover:underline-offset-2"
-			>Kensho</a>
-		</span>
-	</p>
-	<div class="flex flex-wrap gap-2 mb-14">
-		<a href="https://aclanthology.org/2025.acl-long.1417/" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			📄 Paper
-		</a>
-	</div>
-</div>
+<PostHeader {post} />
 
 <!-- Article -->
 <article
@@ -524,17 +511,32 @@
 	</h2>
 
 	<p class="mb-5 text-[17px] leading-relaxed">
-		Report prepared by Charles Lovering.
-	</p>
-
-	<p class="mb-5 text-[17px] leading-relaxed">
 		See more details in our paper,
 		<a href="https://aclanthology.org/2025.acl-long.1417/"
 			class="underline decoration-ink-4/30 hover:text-ink-2 hover:decoration-ink-2/30 transition-all"
 		>Language Model Probabilities are Not Calibrated in Numeric Contexts</a>.
 	</p>
 
-	<pre class="bg-surface-code rounded text-[13px] leading-snug p-4 overflow-x-auto font-mono text-ink-3"><code>@inproceedings&#123;lovering-etal-2025-language,
+	<div class="relative group">
+		<CopyButton text={`@inproceedings{lovering-etal-2025-language,
+    title = "Language Model Probabilities are
+             $Not$ Calibrated in Numeric Contexts",
+    author = "Lovering, Charles and
+      Krumdick, Michael and
+      Lai, Viet Dac and
+      Reddy, Varshini and
+      Ebner, Seth and
+      Kumar, Nilesh and
+      Koncel-Kedziorski, Rik and
+      Tanner, Chris",
+    month = jul,
+    year = "2025",
+    address = "Vienna, Austria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.acl-long.1417/",
+    doi = "10.18653/v1/2025.acl-long.1417",
+}`} />
+		<pre class="bg-surface-code rounded text-[13px] leading-snug p-4 overflow-x-auto font-mono text-ink-3"><code>@inproceedings&#123;lovering-etal-2025-language,
     title = "Language Model Probabilities are
              $Not$ Calibrated in Numeric Contexts",
     author = "Lovering, Charles and
@@ -552,6 +554,7 @@
     url = "https://aclanthology.org/2025.acl-long.1417/",
     doi = "10.18653/v1/2025.acl-long.1417",
 &#125;</code></pre>
+	</div>
 
 </article>
 

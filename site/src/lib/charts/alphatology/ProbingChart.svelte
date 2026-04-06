@@ -1,15 +1,16 @@
 <!--
   Fig 4: Probing selectivity bar chart + best-layer dot overlay.
-  Bars use a monochromatic blue gradient (darker = higher selectivity),
-  styled after the Find article's bar charts.
+  Bars use per-concept colors with hatching patterns (Find Figure 3 style).
 
   data = { selectivity: [{ concept, selectivity, std, bestLayer }], layerHistogram: [...] }
 -->
 <script>
 	import * as d3 from 'd3';
-	import { theme, styleAxis } from './theme.js';
+	import { theme, styleAxis, createConceptPatterns } from './theme.js';
 
 	let { data = { selectivity: [], layerHistogram: [] }, height = 320 } = $props();
+
+	const uid = Math.random().toString(36).slice(2, 8);
 
 	let wrapper = $state();
 	let w = $state(0);
@@ -26,11 +27,12 @@
 		render();
 	});
 
-	// Blue gradient scale matching the Find article's bar style
-	const barGradient = d3.scaleLinear()
-		.domain([0, 0.25])
-		.range(['#78bbe2', '#1a3a5c'])
-		.clamp(true);
+	function barFill(concept) {
+		if (theme.conceptPatterns[concept]) {
+			return `url(#pat-${uid}-${concept})`;
+		}
+		return theme.conceptColors[concept] ?? '#999';
+	}
 
 	function render() {
 		const svg = d3.select(wrapper).selectAll('svg').data([null]);
@@ -53,6 +55,10 @@
 		const y = d3.scaleLinear().domain([0, maxVal]).nice().range([ih, 0]);
 		const yLayer = d3.scaleLinear().domain([0, 9]).range([ih, 0]);
 
+		// Pattern defs
+		const defs = root.append('defs');
+		createConceptPatterns(defs, labels, uid);
+
 		// Axes
 		const xG = g.append('g').attr('transform', `translate(0,${ih})`).call(d3.axisBottom(x));
 		styleAxis(xG, { orient: 'bottom' });
@@ -61,7 +67,8 @@
 			.attr('transform', 'rotate(-35)')
 			.attr('text-anchor', 'end')
 			.attr('dx', '-0.4em')
-			.attr('dy', '0.4em');
+			.attr('dy', '0.4em')
+			.attr('fill', d => theme.conceptColors[d] ?? theme.ink[2]);
 
 		const yG = g.append('g').call(d3.axisLeft(y).ticks(5));
 		styleAxis(yG, { grid: true, width: iw, height: ih, orient: 'left' });
@@ -71,14 +78,14 @@
 			.call(d3.axisRight(yLayer).ticks(10).tickFormat(d => `L${d}`));
 		styleAxis(yLayerG, { orient: 'right' });
 
-		// Bars — monochromatic blue gradient by selectivity value
+		// Bars — per-concept color with hatching
 		g.selectAll('.bar').data(items).enter().append('rect')
 			.attr('class', 'bar')
 			.attr('x', d => x(d.concept))
 			.attr('y', d => y(d.selectivity))
 			.attr('width', x.bandwidth())
 			.attr('height', d => ih - y(d.selectivity))
-			.attr('fill', d => barGradient(d.selectivity))
+			.attr('fill', d => barFill(d.concept))
 			.attr('rx', 1);
 
 		// Error bars
@@ -99,7 +106,7 @@
 			.attr('cx', d => x(d.concept) + x.bandwidth() / 2)
 			.attr('cy', d => yLayer(d.bestLayer))
 			.attr('r', 5)
-			.attr('fill', '#AD2111')
+			.attr('fill', theme.ink[0])
 			.attr('stroke', theme.surface.page)
 			.attr('stroke-width', 1.5);
 
@@ -119,14 +126,14 @@
 		// Legend
 		const leg = root.append('g').attr('transform', `translate(${m.left + 8}, ${m.top + 4})`);
 		leg.append('rect').attr('width', 10).attr('height', 10).attr('rx', 1)
-			.attr('fill', '#3672a4');
+			.attr('fill', theme.ink[3]);
 		leg.append('text').attr('x', 14).attr('y', 9)
 			.attr('font-family', theme.font.sans).attr('font-size', theme.font.size.legend)
-			.attr('fill', theme.ink[2]).text('Selectivity');
+			.attr('fill', theme.ink[2]).text('Selectivity (color = concept)');
 
-		const leg2 = root.append('g').attr('transform', `translate(${m.left + 100}, ${m.top + 4})`);
+		const leg2 = root.append('g').attr('transform', `translate(${m.left + 180}, ${m.top + 4})`);
 		leg2.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4)
-			.attr('fill', '#AD2111').attr('stroke', theme.surface.page).attr('stroke-width', 1.5);
+			.attr('fill', theme.ink[0]).attr('stroke', theme.surface.page).attr('stroke-width', 1.5);
 		leg2.append('text').attr('x', 14).attr('y', 9)
 			.attr('font-family', theme.font.sans).attr('font-size', theme.font.size.legend)
 			.attr('fill', theme.ink[2]).text('Best layer');

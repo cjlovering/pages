@@ -4,7 +4,12 @@
 	import { BarPlot, Heatmap, LinePlot, theme } from '$lib/charts/find';
 	import TaskSetupFigure from '$lib/charts/find/TaskSetupFigure.svelte';
 	import ExampleCard from '$lib/components/ExampleCard.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
 	import { SvelteSet } from 'svelte/reactivity';
+	import CopyButton from '$lib/components/CopyButton.svelte';
+
+	const post = posts.find(p => p.slug === 'find');
 
 	let { data } = $props();
 
@@ -80,29 +85,7 @@
 	];
 </script>
 
-<!-- Post Heading -->
-<div id="top" class="mx-auto max-w-[660px] text-left">
-	<h1 class="font-serif font-semibold text-[30px] mt-6 leading-snug">
-		Language Models Are (Surprisingly?) Good at Finding Inconsistencies in Documents
-	</h1>
-	<p class="text-[18px] leading-none tracking-wide font-sans mt-6 mb-5">
-		<span class="text-ink-3">Research @
-			<a href="https://kensho.com/research"
-				class="text-inherit no-underline hover:underline hover:decoration-ink/20 hover:underline-offset-2"
-			>Kensho</a>
-		</span>
-	</p>
-	<div class="flex flex-wrap gap-2 mb-14">
-		<a href="https://arxiv.org/abs/2512.18601" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			📄 Paper
-		</a>
-		<a href="https://huggingface.co/datasets/kensho/FIND" target="_blank" rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-sans text-ink-3 bg-surface border border-border-light no-underline hover:border-ink-4/40 hover:text-ink-2 transition-all">
-			🗂️ Dataset
-		</a>
-	</div>
-</div>
+<PostHeader {post} />
 
 <!-- Article -->
 <article
@@ -242,17 +225,14 @@
 		manually evaluated
 		<code class="px-1 text-accent text-[0.88em] font-mono">gpt-5</code>'s
 		predictions on a subset of 25 documents per
-		source.<Sidenote id="sn-precision"><strong>Precision</strong> counts only exact matches
-		to the inserted inconsistency. <strong>Usefulness</strong> is broader: it counts
-		any suggestion that a domain expert judged to be a real or helpful finding,
-		including issues present in the original document.</Sidenote>
+		source.
 	</p>
 
 	<figure class="relative [counter-increment:figure-counter] overflow-visible block mb-8">
 		<BarPlot
 			data={precisionBarData}
 			yLabel="%"
-			title="gpt-5: Precision & Usefulness by Dataset"
+			title="Precision & Usefulness by Dataset"
 			grid={true}
 			height={300}
 			colorMap={precisionColors}
@@ -269,7 +249,10 @@
 			<code class="px-1 text-accent text-[0.88em] font-mono">gpt-5</code>
 			predictions across datasets. Overall, 53% of predictions exactly match the
 			inserted inconsistency (precision), and 67% are judged useful by domain
-			experts (usefulness). The model averages 2.6 findings per document.
+			experts (usefulness). The model averages 2.6 findings per document.<Sidenote id="sn-precision"><strong>Precision</strong> counts only exact matches
+			to the inserted inconsistency. <strong>Usefulness</strong> is broader: it counts
+			any suggestion that a domain expert judged to be a real or helpful finding,
+			including issues present in the original document.</Sidenote>
 		</figcaption>
 	</figure>
 
@@ -367,18 +350,19 @@
 		<span>Citation<a href="#citation" class="heading-anchor">#</a></span>
 	</h2>
 
-	<p class="mb-5 text-[17px] leading-relaxed">
-		Report prepared by Charles Lovering.
-	</p>
-
-	<p class="mb-5 text-[17px] leading-relaxed">
-		If you found this useful please see and (perhaps cite!) our
-		<a href="https://arxiv.org/abs/2512.18601"
-			class="underline decoration-ink-4/30 hover:text-ink-2 hover:decoration-ink-2/30 transition-all"
-		>paper</a>.
-	</p>
-
-	<pre class="bg-surface-code rounded text-[13px] leading-snug p-4 overflow-x-auto font-mono text-ink-3"><code>@misc&#123;lovering2025findinginconsistenciesdocuments,
+	<div class="relative group">
+		<CopyButton text={`@misc{lovering2025findinginconsistenciesdocuments,
+      title={On Finding Inconsistencies in Documents},
+      author={Charles J. Lovering and Seth Ebner and Brandon Smock
+              and Michael Krumdick and Saad Rabbani and Ahmed Muhammad
+              and Varshini Reddy and Chris Tanner},
+      year={2025},
+      eprint={2512.18601},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2512.18601},
+}`} />
+		<pre class="bg-surface-code rounded text-[13px] leading-snug p-4 overflow-x-auto font-mono text-ink-3"><code>@misc&#123;lovering2025findinginconsistenciesdocuments,
       title=&#123;On Finding Inconsistencies in Documents&#125;,
       author=&#123;Charles J. Lovering and Seth Ebner and Brandon Smock
               and Michael Krumdick and Saad Rabbani and Ahmed Muhammad
@@ -389,6 +373,7 @@
       primaryClass=&#123;cs.CL&#125;,
       url=&#123;https://arxiv.org/abs/2512.18601&#125;,
 &#125;</code></pre>
+	</div>
 
 </article>
 

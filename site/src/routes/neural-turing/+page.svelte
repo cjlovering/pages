@@ -2,19 +2,19 @@
 	import { base } from '$app/paths';
 	import Sidenote from '$lib/components/Sidenote.svelte';
 	import Figure from '$lib/components/Figure.svelte';
+	import PostHeader from '$lib/components/PostHeader.svelte';
+	import { posts } from '$lib/posts';
+
+	const post = posts.find(p => p.slug === 'neural-turing');
 </script>
 
 <svelte:head>
-	<title>Neural Turing Machines</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
 </svelte:head>
 
+<PostHeader {post} />
+
 <article class="relative max-w-prose mx-auto">
-	<header class="mb-8">
-		<h1 class="text-3xl font-serif font-normal mb-1 text-ink">Neural Turing Machines</h1>
-		<p class="text-ink-3 text-[1.05rem] leading-relaxed">Memory-augmented neural networks.</p>
-		<p class="text-ink-4 text-[0.85rem] font-sans mt-2">Alex Graves, Greg Wayne, Ivo Danihelka &mdash; Google DeepMind</p>
-	</header>
 
 	<section>
 		<p>

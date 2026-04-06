@@ -31,6 +31,19 @@ const conceptOrder = [
 	'dead', 'captured'
 ];
 
+// SVG pattern types per concept (for bar charts / print a11y)
+const conceptPatterns = {
+	bridge:     { type: 'diagonal', angle: 45, spacing: 6 },
+	crescent:   { type: 'diagonal', angle: -45, spacing: 6 },
+	trapezoid:  { type: 'dots', spacing: 7, r: 1.2 },
+	span:       { type: 'crosshatch', spacing: 6 },
+	edge:       { type: 'horizontal', spacing: 5 },
+	bottleneck: { type: 'vertical', spacing: 5 },
+	escape:     { type: 'diagonal', angle: 30, spacing: 7 },
+	dead:       { type: 'dots', spacing: 8, r: 1.5 },
+	captured:   { type: 'crosshatch', spacing: 7 },
+};
+
 // Series colors for MCTS vs policy network (Find-style blues + red accent)
 const seriesColors = {
 	mcts:   '#1a3a5c', // dark navy (matches Find bar gradient)
@@ -62,7 +75,7 @@ const transition = { duration: 400, easing: d3.easeCubicOut };
 
 export const theme = {
 	ink, surface, border, categorical,
-	conceptColors, conceptOrder, seriesColors,
+	conceptColors, conceptOrder, conceptPatterns, seriesColors,
 	font, margin, axis, transition
 };
 
@@ -91,6 +104,64 @@ export function styleAxis(g, { grid = false, width = 0, height = 0, orient = 'bo
 
 export function conceptScale(domain) {
 	return d3.scaleOrdinal().domain(domain).range(domain.map(c => conceptColors[c] ?? '#999'));
+}
+
+/**
+ * Create SVG pattern defs for concept-colored hatching.
+ * uid: unique prefix to avoid id collisions.
+ */
+export function createConceptPatterns(defs, concepts, uid) {
+	concepts.forEach(name => {
+		const pat = conceptPatterns[name];
+		if (!pat) return;
+		const color = conceptColors[name] ?? '#999';
+		const id = `pat-${uid}-${name}`;
+
+		if (pat.type === 'diagonal') {
+			const s = pat.spacing;
+			const p = defs.append('pattern').attr('id', id)
+				.attr('patternUnits', 'userSpaceOnUse')
+				.attr('width', s).attr('height', s)
+				.attr('patternTransform', `rotate(${pat.angle})`);
+			p.append('rect').attr('width', s).attr('height', s).attr('fill', color);
+			p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', s)
+				.attr('stroke', 'rgba(255,255,255,0.35)').attr('stroke-width', 1.5);
+		} else if (pat.type === 'dots') {
+			const s = pat.spacing;
+			const p = defs.append('pattern').attr('id', id)
+				.attr('patternUnits', 'userSpaceOnUse')
+				.attr('width', s).attr('height', s);
+			p.append('rect').attr('width', s).attr('height', s).attr('fill', color);
+			p.append('circle').attr('cx', s / 2).attr('cy', s / 2).attr('r', pat.r)
+				.attr('fill', 'rgba(255,255,255,0.4)');
+		} else if (pat.type === 'crosshatch') {
+			const s = pat.spacing;
+			const p = defs.append('pattern').attr('id', id)
+				.attr('patternUnits', 'userSpaceOnUse')
+				.attr('width', s).attr('height', s);
+			p.append('rect').attr('width', s).attr('height', s).attr('fill', color);
+			p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', s).attr('y2', s)
+				.attr('stroke', 'rgba(255,255,255,0.3)').attr('stroke-width', 1);
+			p.append('line').attr('x1', s).attr('y1', 0).attr('x2', 0).attr('y2', s)
+				.attr('stroke', 'rgba(255,255,255,0.3)').attr('stroke-width', 1);
+		} else if (pat.type === 'horizontal') {
+			const s = pat.spacing;
+			const p = defs.append('pattern').attr('id', id)
+				.attr('patternUnits', 'userSpaceOnUse')
+				.attr('width', s).attr('height', s);
+			p.append('rect').attr('width', s).attr('height', s).attr('fill', color);
+			p.append('line').attr('x1', 0).attr('y1', s / 2).attr('x2', s).attr('y2', s / 2)
+				.attr('stroke', 'rgba(255,255,255,0.35)').attr('stroke-width', 1);
+		} else if (pat.type === 'vertical') {
+			const s = pat.spacing;
+			const p = defs.append('pattern').attr('id', id)
+				.attr('patternUnits', 'userSpaceOnUse')
+				.attr('width', s).attr('height', s);
+			p.append('rect').attr('width', s).attr('height', s).attr('fill', color);
+			p.append('line').attr('x1', s / 2).attr('y1', 0).attr('x2', s / 2).attr('y2', s)
+				.attr('stroke', 'rgba(255,255,255,0.35)').attr('stroke-width', 1);
+		}
+	});
 }
 
 export default theme;

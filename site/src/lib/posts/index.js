@@ -6,7 +6,12 @@ export const posts = [
 		subtitle: 'Can language models detect inconsistencies across long documents?',
 		date: '2025',
 		section: 'research',
-		tags: ['Kensho', 'Under Review', 'LLMs', 'datasets', 'evaluation']
+		tags: ['Kensho', 'Under Review', 'LLMs', 'datasets', 'evaluation'],
+		affiliations: [{ name: 'Kensho', url: 'https://kensho.com/research' }],
+		links: [
+			{ label: 'Paper', href: 'https://arxiv.org/abs/2512.18601' },
+			{ label: 'Dataset', href: 'https://huggingface.co/datasets/kensho/FIND' },
+		],
 	},
 	{
 		slug: 'fenway',
@@ -14,7 +19,11 @@ export const posts = [
 		subtitle: 'Evaluating numeric calibration in language model outputs.',
 		date: '2025',
 		section: 'research',
-		tags: ['Kensho', 'ACL 2025', 'LLMs', 'calibration', 'interpretability']
+		tags: ['Kensho', 'ACL 2025', 'LLMs', 'calibration', 'interpretability'],
+		affiliations: [{ name: 'Kensho', url: 'https://kensho.com/research' }],
+		links: [
+			{ label: 'Paper', href: 'https://aclanthology.org/2025.acl-long.1417/' },
+		],
 	},
 	{
 		slug: 'listicles',
@@ -22,7 +31,9 @@ export const posts = [
 		subtitle: 'A natural dataset without the biases of human-elicited datasets.',
 		date: '2018',
 		section: 'research',
-		tags: ['Brown', 'datasets', 'NLP']
+		tags: ['Brown', 'datasets', 'NLP'],
+		authors: 'Charles Lovering, Ellie Pavlick',
+		affiliations: [{ name: 'Brown University', url: 'https://cs.brown.edu' }],
 	},
 	{
 		slug: 'predicting-biases',
@@ -30,7 +41,16 @@ export const posts = [
 		subtitle: 'Feature extractability predicts when fine-tuned models rely on spurious heuristics.',
 		date: '2021',
 		section: 'research',
-		tags: ['Brown', 'ICLR 2021', 'LLMs', 'interpretability']
+		tags: ['Brown', 'ICLR 2021', 'LLMs', 'interpretability'],
+		authors: 'Charles Lovering, Rohan Jha, Tal Linzen, Ellie Pavlick',
+		affiliations: [
+			{ name: 'Brown', url: 'https://cs.brown.edu' },
+			{ name: 'NYU', url: 'https://www.nyu.edu' },
+		],
+		links: [
+			{ label: 'Paper', href: 'https://openreview.net/forum?id=mNtmhaDkAr' },
+			{ label: 'Code', href: 'https://github.com/cjlovering/predicting-inductive-biases' },
+		],
 	},
 	{
 		slug: 'training-priors',
@@ -38,7 +58,12 @@ export const posts = [
 		subtitle: 'Do text-to-image models generalize compositionally or mix-and-match from training?',
 		date: '2023',
 		section: 'research',
-		tags: ['Brown', 'Shelved', 'text-to-image', 'evaluation']
+		tags: ['Brown', 'Shelved', 'text-to-image', 'evaluation'],
+		authors: 'Charles Lovering, Ellie Pavlick',
+		affiliations: [{ name: 'Brown University', url: 'https://cs.brown.edu' }],
+		links: [
+			{ label: 'Preprint', href: 'https://arxiv.org/abs/2306.01755' },
+		],
 	},
 	{
 		slug: 'alphatology',
@@ -46,7 +71,13 @@ export const posts = [
 		subtitle: 'Analyzing concepts in AlphaZero in Hex using probing classifiers and behavioral tests.',
 		date: '2022',
 		section: 'research',
-		tags: ['Brown', 'NeurIPS 2022', 'reinforcement learning', 'interpretability']
+		tags: ['Brown', 'NeurIPS 2022', 'reinforcement learning', 'interpretability'],
+		authors: 'Charles Lovering*, Jessica Zosa Forde*, George Konidaris, Ellie Pavlick, Michael L. Littman',
+		affiliations: [{ name: 'Brown', url: 'https://cs.brown.edu' }],
+		links: [
+			{ label: 'Paper', href: 'https://proceedings.neurips.cc/paper_files/paper/2022/hash/79bf4400e1e4e6b209650e3c06e5e9e6-Abstract-Conference.html' },
+			{ label: 'Code', href: 'https://github.com/jzf2101/alphatology' },
+		],
 	},
 	{
 		slug: 'interpretable-rl',
@@ -54,7 +85,12 @@ export const posts = [
 		subtitle: 'Reimplementation for NeurIPS Reproducibility Challenge 2019.',
 		date: '2019',
 		section: 'research',
-		tags: ['Brown', 'reinforcement learning', 'interpretability']
+		tags: ['Brown', 'reinforcement learning', 'interpretability'],
+		authors: 'Charles Lovering',
+		affiliations: [{ name: 'Brown University', url: 'https://cs.brown.edu' }],
+		links: [
+			{ label: 'Code', href: 'https://github.com/cjlovering/torchbeast' },
+		],
 	},
 
 	// ── Exposition ────────────────────────────────────────
@@ -64,7 +100,8 @@ export const posts = [
 		subtitle: 'Attention is all you need.',
 		date: '2019',
 		section: 'exposition',
-		tags: ['deep learning', 'NLP']
+		tags: ['deep learning', 'NLP'],
+		authors: 'Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, Polosukhin',
 	},
 	{
 		slug: 'beam-search',
@@ -72,7 +109,7 @@ export const posts = [
 		subtitle: 'Exposition of beam search.',
 		date: '2019',
 		section: 'exposition',
-		tags: ['algorithms', 'NLP']
+		tags: ['algorithms', 'NLP'],
 	},
 	{
 		slug: 'neural-turing',
@@ -80,7 +117,9 @@ export const posts = [
 		subtitle: 'Memory-augmented neural networks.',
 		date: '2019',
 		section: 'exposition',
-		tags: ['deep learning']
+		tags: ['deep learning'],
+		authors: 'Alex Graves, Greg Wayne, Ivo Danihelka',
+		affiliations: [{ name: 'Google DeepMind' }],
 	},
 	{
 		slug: 'byte-encoding',
@@ -88,7 +127,8 @@ export const posts = [
 		subtitle: 'Neural machine translation of rare words with subword units.',
 		date: '2019',
 		section: 'exposition',
-		tags: ['NLP']
+		tags: ['NLP'],
+		authors: 'Rico Sennrich, Barry Haddow, Alexandra Birch',
 	},
 
 	// ── Notes ─────────────────────────────────────────────
@@ -98,7 +138,7 @@ export const posts = [
 		subtitle: 'Merge pre-trained parameters into a new Haiku model.',
 		date: '2020',
 		section: 'notes',
-		tags: ['Python', 'JAX']
+		tags: ['Python', 'JAX'],
 	},
 	{
 		slug: 'auto-format-python',
@@ -106,7 +146,7 @@ export const posts = [
 		subtitle: 'Set up VS Code to format with black on every save.',
 		date: '2020',
 		section: 'notes',
-		tags: ['Python', 'tools']
+		tags: ['Python', 'tools'],
 	},
 	{
 		slug: '3d-indexing-pytorch',
@@ -114,7 +154,7 @@ export const posts = [
 		subtitle: 'Select vectors from a 3-D tensor by index.',
 		date: '2020',
 		section: 'notes',
-		tags: ['Python', 'PyTorch']
+		tags: ['Python', 'PyTorch'],
 	},
 	{
 		slug: 'pretty-print-pandas',
@@ -122,7 +162,7 @@ export const posts = [
 		subtitle: 'Use display() for HTML-formatted tables anywhere in a cell.',
 		date: '2020',
 		section: 'notes',
-		tags: ['Python', 'pandas']
+		tags: ['Python', 'pandas'],
 	},
 	{
 		slug: 'defaultdict-from-dict',
@@ -130,7 +170,7 @@ export const posts = [
 		subtitle: 'One-line defaultdict initialization with existing data.',
 		date: '2020',
 		section: 'notes',
-		tags: ['Python']
+		tags: ['Python'],
 	},
 	{
 		slug: 'seaborn-too-many-values',
@@ -138,7 +178,7 @@ export const posts = [
 		subtitle: 'Handle more than 6 style values in line plots.',
 		date: '2020',
 		section: 'notes',
-		tags: ['Python', 'seaborn']
+		tags: ['Python', 'seaborn'],
 	},
 	{
 		slug: 'bash-too-many-files',
@@ -146,7 +186,7 @@ export const posts = [
 		subtitle: 'Use find when cp/mv/rename hits the argument limit.',
 		date: '2020',
 		section: 'notes',
-		tags: ['bash']
+		tags: ['bash'],
 	},
 	{
 		slug: 'git-on-a-server',
@@ -154,7 +194,7 @@ export const posts = [
 		subtitle: 'Fixes for common git annoyances on remote machines.',
 		date: '2020',
 		section: 'notes',
-		tags: ['git']
+		tags: ['git'],
 	},
 	{
 		slug: 'readable-file-sizes',
@@ -162,7 +202,7 @@ export const posts = [
 		subtitle: 'Human-readable sizes with du -h.',
 		date: '2020',
 		section: 'notes',
-		tags: ['bash']
+		tags: ['bash'],
 	},
 	{
 		slug: 'number-of-batches',
@@ -170,7 +210,7 @@ export const posts = [
 		subtitle: 'Correct iteration count including the remainder batch.',
 		date: '2020',
 		section: 'notes',
-		tags: ['Python', 'deep learning']
+		tags: ['Python', 'deep learning'],
 	},
 	{
 		slug: 'compile-latex',
@@ -178,7 +218,7 @@ export const posts = [
 		subtitle: 'The correct command sequence for resolved references.',
 		date: '2020',
 		section: 'notes',
-		tags: ['LaTeX']
+		tags: ['LaTeX'],
 	}
 ];
 
