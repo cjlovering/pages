@@ -6,6 +6,7 @@ lora_files/
 # Loose HTML files (except the landing page)
 *.html
 !index.html
+!site/src/app.html
 
 # OS
 .DS_Store
