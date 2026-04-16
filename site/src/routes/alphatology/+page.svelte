@@ -1,4 +1,5 @@
 <script>
+	import { base } from '$app/paths';
 	import Toc from '$lib/components/Toc.svelte';
 	import Sidenote from '$lib/components/Sidenote.svelte';
 	import Figure from '$lib/components/Figure.svelte';
@@ -40,7 +41,7 @@
 	let boardCellData = $state(null);
 
 	async function loadJson(path) {
-		const res = await fetch(path);
+		const res = await fetch(`${base}${path}`);
 		return res.json();
 	}
 
@@ -56,10 +57,10 @@
 	});
 
 	const boardFrames = [
-		{ src: '/alphatology/board-grubby-0.png', checkpoint: 0 },
-		{ src: '/alphatology/board-grubby-10.png', checkpoint: 10 },
-		{ src: '/alphatology/board-grubby-15.png', checkpoint: 15 },
-		{ src: '/alphatology/board-grubby-20.png', checkpoint: 20 },
+		{ src: `${base}/alphatology/board-grubby-0.png`, checkpoint: 0 },
+		{ src: `${base}/alphatology/board-grubby-10.png`, checkpoint: 10 },
+		{ src: `${base}/alphatology/board-grubby-15.png`, checkpoint: 15 },
+		{ src: `${base}/alphatology/board-grubby-20.png`, checkpoint: 20 },
 	];
 
 	const positiveConcepts = ['bridge', 'crescent', 'trapezoid', 'span', 'edge', 'bottleneck', 'escape'];
@@ -112,7 +113,7 @@
 		<span>Concepts in Hex<a href="#concepts" class="heading-anchor">#</a></span>
 	</h2>
 
-	<Figure src="/alphatology/fig1a-win-for-black.png" alt="A completed Hex board showing a win for black" maxWidth="240px">
+	<Figure src="{base}/alphatology/fig1a-win-for-black.png" alt="A completed Hex board showing a win for black" maxWidth="240px">
 		A winning board for black, connecting the black edges.
 	</Figure>
 
@@ -127,7 +128,7 @@
 		<a href="https://webdocs.cs.ualberta.ca/~hayward/hex/" class="underline decoration-ink-4/30">MoHex</a>.</Sidenote>
 	</p>
 
-	<Figure src="/alphatology/fig1b-concept-examples.png" alt="Short-term vs long-term concept examples on Hex boards" maxWidth="435px">
+	<Figure src="{base}/alphatology/fig1b-concept-examples.png" alt="Short-term vs long-term concept examples on Hex boards" maxWidth="435px">
 		Short- vs long-term concepts. If black plays A or B in the left
 		board, black immediately wins (short-term). In the right board, A and B can
 		help black win only in the long-term.
@@ -156,7 +157,7 @@
 			that cell is captured. Both should never be filled.</Sidenote></li>
 	</ul>
 
-	<Figure src="/alphatology/fig2-concepts.png" alt="Hex concept taxonomy: bridge, crescent, trapezoid, span, edge, bottleneck, escape, dead cells, captured cells" maxWidth="660px">
+	<Figure src="{base}/alphatology/fig2-concepts.png" alt="Hex concept taxonomy: bridge, crescent, trapezoid, span, edge, bottleneck, escape, dead cells, captured cells" maxWidth="660px">
 		Hex templates exemplifying game concepts. Positive concepts provide the player
 		with multiple ways to connect pieces despite possible attacks. Negative concepts
 		change the strategic value of open spots. Arrows indicate connection to the
@@ -187,7 +188,7 @@
 		that during a selfplay continuation, the agent does not fill dead or captured cells.
 	</p>
 
-	<Figure src="/alphatology/fig3-behavioral-tests.png" alt="Creating behavioral tests from concept templates in four steps" maxWidth="520px">
+	<Figure src="{base}/alphatology/fig3-behavioral-tests.png" alt="Creating behavioral tests from concept templates in four steps" maxWidth="520px">
 		Creating behavioral tests. The minimal template (a) is translated to a random
 		board position (b). Both players' pieces are connected to their edges (c).
 		Noise pieces form a valid board (d). If white plays A, black must play B to win.
