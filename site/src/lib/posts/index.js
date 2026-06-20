@@ -4,9 +4,9 @@ export const posts = [
 		slug: 'find',
 		title: 'On Finding Inconsistencies in Documents',
 		subtitle: 'Can language models detect inconsistencies across long documents?',
-		date: '2025',
+		date: '2026',
 		section: 'research',
-		tags: ['Kensho', 'Under Review', 'LLMs', 'datasets', 'evaluation'],
+		tags: ['Kensho', 'ACL 2026', 'LLMs', 'datasets', 'evaluation'],
 		affiliations: [{ name: 'Kensho', url: 'https://kensho.com/research' }],
 		links: [
 			{ label: 'Paper', href: 'https://arxiv.org/abs/2512.18601' },
