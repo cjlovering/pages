@@ -1160,7 +1160,7 @@
 							{#each post.tags as tag}
 								<span class="tag"
 								class:tag-affiliation={tag === 'Kensho' || tag === 'Brown'}
-								class:tag-venue={tag === 'ACL 2025' || tag === 'ICLR 2021' || tag === 'NeurIPS 2022' || tag === 'Under Review' || tag === 'Shelved'}
+								class:tag-venue={tag.includes('ACL') || tag === 'ICLR 2021' || tag === 'NeurIPS 2022' || tag === 'Under Review' || tag === 'Shelved'}
 								class:tag-topic={tag !== 'Kensho' && tag !== 'Brown' && tag !== 'ACL 2025' && tag !== 'ICLR 2021' && tag !== 'NeurIPS 2022' && tag !== 'Under Review' && tag !== 'Shelved'}
 								class:tag-shelved={tag === 'Shelved'}
 							>{tag}</span>
