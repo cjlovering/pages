@@ -1,31 +1,22 @@
 <script>
 	import { base } from '$app/paths';
 	import './layout.css';
-	import 'highlight.js/styles/base16/solarized-light.css';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { afterNavigate } from '$app/navigation';
-	import hljs from 'highlight.js/lib/core';
-	import python from 'highlight.js/lib/languages/python';
-	import bash from 'highlight.js/lib/languages/bash';
-	import latex from 'highlight.js/lib/languages/latex';
-
-	hljs.registerLanguage('python', python);
-	hljs.registerLanguage('bash', bash);
-	hljs.registerLanguage('latex', latex);
 
 	let { children } = $props();
 
-	afterNavigate(() => {
-		document.querySelectorAll('pre code[class*="language-"]:not(.hljs)').forEach((el) => {
-			hljs.highlightElement(el);
-		});
+	afterNavigate(async () => {
+		const blocks = document.querySelectorAll('pre code[class*="language-"]:not(.hljs)');
+		if (!blocks.length) return;
+		const { default: hljs } = await import('$lib/highlight.js');
+		blocks.forEach((el) => hljs.highlightElement(el));
 	});
 </script>
 
 <svelte:head>
 	<title>Charles Lovering</title>
-	<meta name="description" content="Research, exposition, and technical notes on language modeling, interpretability, and evaluation." />
 	<link rel="icon" type="image/png" sizes="32x32" href="{base}/favicon-32.png" />
 	<link rel="icon" type="image/png" sizes="16x16" href="{base}/favicon-16.png" />
 </svelte:head>

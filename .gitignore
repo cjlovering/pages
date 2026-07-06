@@ -27,3 +27,10 @@ dist/
 # Analysis outputs (generated, not source)
 fenway-site/static/analysis_output
 fenway-site/static/figures
+
+# Working/scratch files (drafts, PDF page dumps — keep out of the deployed site)
+temp/
+site/temp/
+site/static/predicting-biases/page-*.png
+site/static/predicting-biases/_fig*.png
+site/static/predicting-biases/paper.pdf

@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600&display=swap');
+/* Chakra Petch is loaded via <link> in app.html (preconnect + parallel fetch
+   instead of a render-blocking @import chain). */
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 

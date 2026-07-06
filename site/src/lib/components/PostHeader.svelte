@@ -4,6 +4,9 @@
 
 <svelte:head>
 	<title>{post.title}</title>
+	{#if post.subtitle}
+		<meta name="description" content={post.subtitle} />
+	{/if}
 </svelte:head>
 
 <div id="top" class="mx-auto max-w-[660px] text-left">

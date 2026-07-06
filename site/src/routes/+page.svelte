@@ -1079,6 +1079,7 @@
 
 <svelte:head>
 	<title>Charles Lovering</title>
+	<meta name="description" content="Research, exposition, and technical notes on language modeling, interpretability, and evaluation." />
 </svelte:head>
 
 <section class="mb-14">

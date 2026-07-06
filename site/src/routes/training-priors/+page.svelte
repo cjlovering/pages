@@ -56,8 +56,8 @@
 
 	<FigureGrid columns={2}>
 		{#snippet images()}
-			<FigureGridItem src="{base}/training-priors/astro-horse.png" alt="Astronaut riding a horse" label="&ldquo;astronaut riding a horse&rdquo;" />
-			<FigureGridItem src="{base}/training-priors/horse-astro.png" alt="Horse riding an astronaut" label="&ldquo;horse riding an astronaut&rdquo;" />
+			<FigureGridItem src="{base}/training-priors/astro-horse.jpg" alt="Astronaut riding a horse" label="&ldquo;astronaut riding a horse&rdquo;" />
+			<FigureGridItem src="{base}/training-priors/horse-astro.jpg" alt="Horse riding an astronaut" label="&ldquo;horse riding an astronaut&rdquo;" />
 		{/snippet}
 		{#snippet caption()}
 			<em>Left:</em> Stable Diffusion generates a faithful image for the common triad.
@@ -84,8 +84,8 @@
 
 	<FigureGrid columns={2}>
 		{#snippet images()}
-			<FigureGridItem src="{base}/training-priors/dog-chasing-ball.png" alt="Dog chasing a ball" label="&ldquo;dog chasing a ball&rdquo;" />
-			<FigureGridItem src="{base}/training-priors/ball-chasing-dog.png" alt="Ball chasing a dog" label="&ldquo;ball chasing a dog&rdquo;" />
+			<FigureGridItem src="{base}/training-priors/dog-chasing-ball.jpg" alt="Dog chasing a ball" label="&ldquo;dog chasing a ball&rdquo;" />
+			<FigureGridItem src="{base}/training-priors/ball-chasing-dog.jpg" alt="Ball chasing a dog" label="&ldquo;ball chasing a dog&rdquo;" />
 		{/snippet}
 		{#snippet caption()}
 			<em>Left:</em> The common triad yields a correct image. <em>Right:</em> The flipped
