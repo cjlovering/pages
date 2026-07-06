@@ -22,16 +22,28 @@
 	let alphatologyCanvas = $state();
 	let lindenmayerCanvas = $state();
 	let playgroundCanvas = $state();
+	let mockhangCanvas = $state();
 
 	const artifacts = [
 		{
+			key: 'mockhang',
+			title: 'mockhang',
+			subtitle: 'Arrange your wall.',
+			date: '2026',
+			url: 'https://cjlovering.github.io/mockhang/'
+		},
+		{
+			key: 'lindenmayer',
 			title: 'Lindenmayer Systems',
 			subtitle: 'Generative drawings from L-system grammars.',
+			date: '2019',
 			url: 'https://observablehq.com/collection/@xenocidist/lindenmayer-systems'
 		},
 		{
+			key: 'playground',
 			title: 'Interactive Visualizations',
 			subtitle: 'A small playground of interactive sketches.',
+			date: '2016',
 			url: 'https://cjlovering.github.io/playground/'
 		}
 	];
@@ -1049,6 +1061,78 @@
 		}
 	}
 
+	// Abstract, "mathified" take on the mockhang favicon: earthy pixel-smear
+	// streaks over a warm wall, with a few floating frames being hung.
+	function renderMockhangCard(canvas) {
+		const { ctx, W, H } = setupCanvas(canvas);
+		const rand = rng(5717);
+
+		// warm wall base
+		const g = ctx.createLinearGradient(0, 0, 0, H);
+		g.addColorStop(0, '#eee9e0');
+		g.addColorStop(1, '#e2dccf');
+		ctx.fillStyle = g;
+		ctx.fillRect(0, 0, W, H);
+
+		// earthy palette sampled from the favicon (tans, browns, muted green, ink)
+		const pal = ['#b79a70', '#8a6a46', '#5b4632', '#6d7356', '#525f45', '#c9c2cb', '#3a2f28', '#a98b64'];
+
+		// color field: soft blobs placed to echo the favicon's composition —
+		// warm tones up top, a green to the right, dark earth along the bottom.
+		const cols = 26, rows = 26;
+		const cw = W / cols, ch = H / rows;
+		const blobs = [
+			{ cx: cols * 0.45, cy: rows * 0.16, r: 9, color: '#8a6a46' },
+			{ cx: cols * 0.63, cy: rows * 0.10, r: 6, color: '#b79a70' },
+			{ cx: cols * 0.86, cy: rows * 0.56, r: 6, color: '#6d7356' },
+			{ cx: cols * 0.28, cy: rows * 0.82, r: 8, color: '#5b4632' },
+			{ cx: cols * 0.56, cy: rows * 0.90, r: 7, color: '#3a2f28' }
+		];
+		const field = [];
+		for (let r = 0; r < rows; r++) {
+			field[r] = [];
+			for (let c = 0; c < cols; c++) {
+				let best = null, bestD = Infinity;
+				for (const b of blobs) {
+					const d = Math.hypot(c - b.cx, r - b.cy);
+					if (d < b.r && d < bestD) { bestD = d; best = b; }
+				}
+				field[r][c] = best ? { color: best.color, a: 0.55 * (1 - bestD / best.r) } : null;
+			}
+		}
+
+		// vertical pixel-smear: each cell's colour streaks downward, with a
+		// per-column shear that offsets the streaks like a sorted-pixel glitch.
+		for (let c = 0; c < cols; c++) {
+			const shear = Math.floor((rand() - 0.5) * 4);
+			for (let r = 0; r < rows; r++) {
+				const cell = field[r][c];
+				if (!cell) continue;
+				const x = c * cw;
+				const y = (r + shear) * ch;
+				const len = (1 + Math.floor(rand() * 4)) * ch;
+				const grd = ctx.createLinearGradient(0, y, 0, y + len);
+				grd.addColorStop(0, hexToRgba(cell.color, cell.a));
+				grd.addColorStop(1, hexToRgba(cell.color, 0));
+				ctx.fillStyle = grd;
+				ctx.fillRect(x, y, cw + 0.5, len);
+			}
+		}
+
+		// a few crisp frames floating on the wall — the art being hung
+		for (let i = 0; i < 3; i++) {
+			const fw = W * (0.13 + rand() * 0.13);
+			const fh = fw * (0.8 + rand() * 0.6);
+			const fx = rand() * (W - fw);
+			const fy = rand() * (H - fh);
+			ctx.fillStyle = hexToRgba(pal[Math.floor(rand() * pal.length)], 0.45);
+			ctx.fillRect(fx, fy, fw, fh);
+			ctx.strokeStyle = 'rgba(58,47,40,0.35)';
+			ctx.lineWidth = 1;
+			ctx.strokeRect(fx + 0.5, fy + 0.5, fw, fh);
+		}
+	}
+
 	function renderAll() {
 		if (findCanvas) renderFindCard(findCanvas);
 		if (fenwayCanvas) renderFenwayCard(fenwayCanvas);
@@ -1063,6 +1147,7 @@
 		if (alphatologyCanvas) renderAlphatologyCard(alphatologyCanvas);
 		if (lindenmayerCanvas) renderLindenmayerCard(lindenmayerCanvas);
 		if (playgroundCanvas) renderPlaygroundCard(playgroundCanvas);
+		if (mockhangCanvas) renderMockhangCard(mockhangCanvas);
 	}
 
 	onMount(() => {
@@ -1182,7 +1267,9 @@
 					{#each artifacts as artifact}
 						<a href={artifact.url} target="_blank" rel="noopener noreferrer" class="card">
 							<div class="pane artifact-pane">
-								{#if artifact.title === 'Lindenmayer Systems'}
+								{#if artifact.key === 'mockhang'}
+									<canvas bind:this={mockhangCanvas} class="canvas-fill"></canvas>
+								{:else if artifact.key === 'lindenmayer'}
 									<canvas bind:this={lindenmayerCanvas} class="canvas-fill"></canvas>
 								{:else}
 									<canvas bind:this={playgroundCanvas} class="canvas-fill"></canvas>
@@ -1192,6 +1279,9 @@
 								</svg>
 							</div>
 							<p class="card-label">{artifact.title}</p>
+							<div class="card-tags">
+								<span class="tag tag-date">{artifact.date}</span>
+							</div>
 						</a>
 					{/each}
 				</div>
