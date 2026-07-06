@@ -1069,24 +1069,25 @@
 
 		// warm wall base
 		const g = ctx.createLinearGradient(0, 0, 0, H);
-		g.addColorStop(0, '#eee9e0');
-		g.addColorStop(1, '#e2dccf');
+		g.addColorStop(0, '#f6f2ec');
+		g.addColorStop(1, '#efe9df');
 		ctx.fillStyle = g;
 		ctx.fillRect(0, 0, W, H);
 
-		// earthy palette sampled from the favicon (tans, browns, muted green, ink)
-		const pal = ['#b79a70', '#8a6a46', '#5b4632', '#6d7356', '#525f45', '#c9c2cb', '#3a2f28', '#a98b64'];
+		// earthy palette sampled from the favicon (tans, browns, muted green, ink),
+		// lightened so the pane reads brighter alongside its siblings
+		const pal = ['#cbb18b', '#a78760', '#7c6248', '#8b9070', '#727e5f', '#d7d1d8', '#5a4d43', '#c1a67e'];
 
 		// color field: soft blobs placed to echo the favicon's composition —
 		// warm tones up top, a green to the right, dark earth along the bottom.
 		const cols = 26, rows = 26;
 		const cw = W / cols, ch = H / rows;
 		const blobs = [
-			{ cx: cols * 0.45, cy: rows * 0.16, r: 9, color: '#8a6a46' },
-			{ cx: cols * 0.63, cy: rows * 0.10, r: 6, color: '#b79a70' },
-			{ cx: cols * 0.86, cy: rows * 0.56, r: 6, color: '#6d7356' },
-			{ cx: cols * 0.28, cy: rows * 0.82, r: 8, color: '#5b4632' },
-			{ cx: cols * 0.56, cy: rows * 0.90, r: 7, color: '#3a2f28' }
+			{ cx: cols * 0.45, cy: rows * 0.16, r: 9, color: '#a78760' },
+			{ cx: cols * 0.63, cy: rows * 0.10, r: 6, color: '#cbb18b' },
+			{ cx: cols * 0.86, cy: rows * 0.56, r: 6, color: '#8b9070' },
+			{ cx: cols * 0.28, cy: rows * 0.82, r: 8, color: '#7c6248' },
+			{ cx: cols * 0.56, cy: rows * 0.90, r: 7, color: '#5a4d43' }
 		];
 		const field = [];
 		for (let r = 0; r < rows; r++) {
@@ -1097,7 +1098,7 @@
 					const d = Math.hypot(c - b.cx, r - b.cy);
 					if (d < b.r && d < bestD) { bestD = d; best = b; }
 				}
-				field[r][c] = best ? { color: best.color, a: 0.55 * (1 - bestD / best.r) } : null;
+				field[r][c] = best ? { color: best.color, a: 0.42 * (1 - bestD / best.r) } : null;
 			}
 		}
 
@@ -1125,9 +1126,9 @@
 			const fh = fw * (0.8 + rand() * 0.6);
 			const fx = rand() * (W - fw);
 			const fy = rand() * (H - fh);
-			ctx.fillStyle = hexToRgba(pal[Math.floor(rand() * pal.length)], 0.45);
+			ctx.fillStyle = hexToRgba(pal[Math.floor(rand() * pal.length)], 0.35);
 			ctx.fillRect(fx, fy, fw, fh);
-			ctx.strokeStyle = 'rgba(58,47,40,0.35)';
+			ctx.strokeStyle = 'rgba(90,77,67,0.28)';
 			ctx.lineWidth = 1;
 			ctx.strokeRect(fx + 0.5, fy + 0.5, fw, fh);
 		}
